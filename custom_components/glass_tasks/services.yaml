@@ -1,0 +1,136 @@
+complete:
+  name: Mark task done
+  description: Mark a task as done, as if someone tapped it on the board.
+  fields:
+    task:
+      name: Task
+      description: The task's name (for example "Feed the dog") or its id.
+      required: true
+      example: Feed the dog
+      selector:
+        text:
+    by:
+      name: Done by
+      description: The person who did it (a person entity or a board member id). Leave empty to use whoever ran this.
+      example: person.sam
+      selector:
+        text:
+
+undo:
+  name: Undo last done
+  description: Take back the most recent time a task was marked done.
+  fields:
+    task:
+      name: Task
+      description: The task's name or id.
+      required: true
+      example: Feed the dog
+      selector:
+        text:
+
+add_task:
+  name: Add task
+  description: Add a recurring task to the board.
+  fields:
+    title:
+      name: Name
+      required: true
+      example: Water the plants
+      selector:
+        text:
+    icon:
+      name: Icon
+      description: An emoji for the tile.
+      example: 🪴
+      selector:
+        text:
+    repeat:
+      name: Repeats
+      default: daily
+      selector:
+        select:
+          options:
+            - label: Every day
+              value: daily
+            - label: On certain days of the week
+              value: weekly
+            - label: Every few days (counted from when it was last done)
+              value: every
+    days:
+      name: Days of the week
+      description: For "certain days". 0 is Monday, 6 is Sunday.
+      example: "[1, 4]"
+      selector:
+        object:
+    every_days:
+      name: Every how many days
+      description: For "every few days".
+      example: 3
+      selector:
+        number:
+          min: 1
+          max: 365
+    times:
+      name: Due by
+      description: One or more times of day, like 08:00 and 18:00. Leave empty for "any time that day".
+      example: '["08:00", "18:00"]'
+      selector:
+        object:
+    assignee:
+      name: Whose job
+      description: everyone, a person entity or a board member id.
+      example: everyone
+      selector:
+        text:
+    tint:
+      name: Colour
+      selector:
+        select:
+          options: [clear, rose, amber, mint, sky, violet]
+    notify:
+      name: Remind when overdue
+      default: true
+      selector:
+        boolean:
+
+delete_task:
+  name: Remove task
+  description: Remove a task from the board.
+  fields:
+    task:
+      name: Task
+      description: The task's name or id.
+      required: true
+      example: Feed the dog
+      selector:
+        text:
+
+set_background:
+  name: Set background
+  description: Switch the board's colour theme on every screen. Use a preset, or "custom" with three colours.
+  fields:
+    preset:
+      name: Theme
+      required: true
+      example: aurora
+      selector:
+        select:
+          options:
+            - aurora
+            - black
+            - sunset
+            - ocean
+            - forest
+            - lavender
+            - ember
+            - graphite
+            - midnight
+            - halloween
+            - festive
+            - custom
+    colors:
+      name: Custom colours
+      description: Three colours for "custom", like "#3366ff, #ff66aa, #22ccbb".
+      example: "#3366ff, #ff66aa, #22ccbb"
+      selector:
+        text:

@@ -1,0 +1,26 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Glass Task Board",
+        "description": "Adds a board for recurring household tasks. The glass card is loaded automatically — add it to a dashboard as \"Glass Task Board\"."
+      }
+    },
+    "abort": {
+      "already_configured": "The task board is already set up.",
+      "single_instance_allowed": "The task board is already set up."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Overdue reminders",
+        "description": "For each person, pick the notify service(s) that should remind them when one of their tasks is overdue (for example notify.mobile_app_pixel). Tasks for \"Everyone\" remind every person below. People added on the board itself are set up in the card's People screen.",
+        "data": {
+          "notify_everyone": "Extra services for tasks that are everyone's job",
+          "notify_url": "Open this dashboard path when a reminder is tapped (e.g. /lovelace/tasks)"
+        }
+      }
+    }
+  }
+}
