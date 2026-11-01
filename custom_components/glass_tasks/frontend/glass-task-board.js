@@ -5,7 +5,7 @@
  * No build step, no dependencies. Served automatically by the glass_tasks integration.
  */
 (() => {
-  const VERSION = "0.1.0";
+  const VERSION = "0.1.1";
   const TAG = "glass-task-board";
   if (customElements.get(TAG)) return;
 
