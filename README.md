@@ -6,7 +6,7 @@
 
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/docs/faq/custom_repositories)
 [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.11%2B-18BCF2.svg?logo=homeassistant&logoColor=white)](https://www.home-assistant.io/)
-[![Version](https://img.shields.io/badge/version-0.4.0-6E56CF.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.3.0-6E56CF.svg)](CHANGELOG.md)
 [![Languages](https://img.shields.io/badge/languages-English%20%7C%20Deutsch%20%7C%20Espa%C3%B1ol%20%7C%20Fran%C3%A7ais-2E9E6B.svg)](#languages)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -174,7 +174,7 @@ After installing or updating, refresh the page once so your browser loads the bo
 If you manage dashboards in YAML (`lovelace: mode: yaml` in `configuration.yaml`), the integration can't edit your resources. It loads the board on every page instead, so it still works. If you prefer to list it yourself, add this under `lovelace: resources:`:
 
 ```yaml
-- url: /glass_tasks/glass-task-board.js?v=0.4.0
+- url: /glass_tasks/glass-task-board.js?v=0.3.0
   type: module
 ```
 
@@ -275,7 +275,6 @@ column_width: 260
 group_by_status: false
 show_clock: true
 background_image: /local/wallpaper.jpg
-home_path: /lovelace/0
 alert_overdue: true
 alert_sound: false
 alert_snooze: 15
@@ -290,7 +289,6 @@ alert_snooze: 15
 | `group_by_status` | boolean | `false` | Shows **To do** tiles first, then **Done**, then **Coming up**, instead of a fixed order. |
 | `show_clock` | boolean | `true` | Shows the clock and date in the header. |
 | `background_image` | string | — | Optional image URL displayed behind the glass. |
-| `home_path` | string | — | Shows a **Home** button in the top-left corner of the board that goes to this dashboard, for example `/lovelace/0`. Leave empty to hide it. |
 | `alert_overdue` | boolean | `true` | Shows a full-screen pop-up when a task becomes overdue. Turn it off on dashboards for phones or other screens that shouldn't interrupt. |
 | `alert_sound` | boolean | `false` | Plays a soft chime when the pop-up appears. Some browsers only allow sound after the screen has been touched once. |
 | `alert_snooze` | number | `15` | Minutes that **Remind me in…** hides the pop-up for. |
@@ -532,7 +530,6 @@ Your browser hasn't loaded the board's display file. Work through these steps in
 | The board is small or squeezed | Edit the view (pencil next to the tab name) and set **View type** to **Panel**. |
 | No phone reminders | Open **People**, edit the person and check that a phone is selected. For Home Assistant `person` entities, check **Settings → Devices & services → Glass Task Board → Configure**. Also check that the task's reminders aren't switched off under **More options**. |
 | A phone is missing from the list | Install the Home Assistant app on that phone and sign in, then reopen the People screen. |
-| There's no way back to my main dashboard on the wall tablet | Set `home_path` on the board card to your main dashboard's path (the part of its address after the port, for example `/lovelace/0`). A **Home** button appears in the top-left corner. |
 | A task tapped by mistake | Select **⋮** on the tile, then **Undo last**. |
 | The overdue pop-up doesn't appear | Check that `alert_overdue` isn't set to `false` on that card, and that you didn't select **Got it** for this due time on that screen. The pop-up waits while someone is picking a name or editing a task. |
 | The pop-up shows on my phone too | Add `alert_overdue: false` to the board card on your phone's dashboard. |

@@ -5,7 +5,7 @@
  * No build step, no dependencies. Served automatically by the glass_tasks integration.
  */
 (() => {
-  const VERSION = "0.4.0";
+  const VERSION = "0.3.0";
   const TAG = "glass-task-board";
   if (customElements.get(TAG)) return;
 
@@ -44,7 +44,6 @@
   // in the viewer's Home Assistant profile; anything missing falls back to English.
   const STRINGS = {
     en: {
-      cf_home: "Home button: dashboard to go back to (e.g. /lovelace/0)",
       alert_title: "Don't forget", alert_one: "This task is overdue.", alert_many: "{n} tasks are overdue.", alert_done: "Done", alert_snooze: "Remind me in {n} min", alert_ok: "Got it", cf_alert: "Pop up overdue tasks on this screen", cf_sound: "Play a chime with the pop-up", cf_snooze: "Remind again after (minutes)",
       bg_aurora: "Aurora", bg_black: "Black", bg_sunset: "Sunset", bg_ocean: "Ocean", bg_forest: "Forest", bg_lavender: "Lavender",
       bg_ember: "Ember", bg_graphite: "Graphite", bg_midnight: "Midnight", bg_halloween: "Halloween", bg_festive: "Festive", tint_clear: "clear",
@@ -83,7 +82,6 @@
       notify_label: "Remind them on their phone when their task is overdue", on_board: "On the board", ha_on: "These people from Home Assistant are also on the board.",
     },
     de: {
-      cf_home: "Home-Taste: Dashboard für den Rückweg (z. B. /lovelace/0)",
       alert_title: "Nicht vergessen", alert_one: "Diese Aufgabe ist überfällig.", alert_many: "{n} Aufgaben sind überfällig.", alert_done: "Erledigt", alert_snooze: "In {n} Min. erinnern", alert_ok: "Verstanden", cf_alert: "Überfällige Aufgaben auf diesem Bildschirm einblenden", cf_sound: "Beim Einblenden einen Ton abspielen", cf_snooze: "Erneut erinnern nach (Minuten)",
       bg_aurora: "Polarlicht", bg_black: "Schwarz", bg_sunset: "Sonnenuntergang", bg_ocean: "Ozean", bg_forest: "Wald", bg_lavender: "Lavendel",
       bg_ember: "Glut", bg_graphite: "Graphit", bg_midnight: "Mitternacht", bg_halloween: "Halloween", bg_festive: "Festlich",
@@ -128,7 +126,6 @@
       notify_label: "Auf dem Handy erinnern, wenn ihre Aufgabe überfällig ist", on_board: "Auf der Tafel", ha_on: "Diese Personen aus Home Assistant sind auch auf der Tafel.",
     },
     es: {
-      cf_home: "Botón de inicio: panel al que volver (p. ej. /lovelace/0)",
       alert_title: "No lo olvides", alert_one: "Esta tarea está atrasada.", alert_many: "Hay {n} tareas atrasadas.", alert_done: "Hecha", alert_snooze: "Recuérdamelo en {n} min", alert_ok: "Entendido", cf_alert: "Mostrar las tareas atrasadas en esta pantalla", cf_sound: "Hacer sonar un aviso al mostrarlas", cf_snooze: "Volver a recordar tras (minutos)",
       bg_aurora: "Aurora", bg_black: "Negro", bg_sunset: "Atardecer", bg_ocean: "Océano", bg_forest: "Bosque", bg_lavender: "Lavanda",
       bg_ember: "Brasa", bg_graphite: "Grafito", bg_midnight: "Medianoche", bg_halloween: "Halloween", bg_festive: "Festivo", tint_clear: "transparente",
@@ -170,7 +167,6 @@
       notify_label: "Avisar en su móvil cuando su tarea esté atrasada", on_board: "En el tablero", ha_on: "Estas personas de Home Assistant también están en el tablero.",
     },
     fr: {
-      cf_home: "Bouton d'accueil : tableau de bord où revenir (par ex. /lovelace/0)",
       alert_title: "N'oubliez pas", alert_one: "Cette tâche est en retard.", alert_many: "{n} tâches sont en retard.", alert_done: "Fait", alert_snooze: "Me le rappeler dans {n} min", alert_ok: "Compris", cf_alert: "Afficher les tâches en retard sur cet écran", cf_sound: "Jouer un carillon à l'affichage", cf_snooze: "Rappeler à nouveau après (minutes)",
       bg_aurora: "Aurore", bg_black: "Noir", bg_sunset: "Coucher de soleil", bg_ocean: "Océan", bg_forest: "Forêt", bg_lavender: "Lavande",
       bg_ember: "Braise", bg_graphite: "Graphite", bg_midnight: "Minuit", bg_halloween: "Halloween", bg_festive: "Festif", tint_clear: "transparent",
@@ -285,7 +281,6 @@
     reply: '<svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>',
     plus: '<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>',
     people: '<svg viewBox="0 0 24 24"><path d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3zm-8 0a3 3 0 1 0-3-3 3 3 0 0 0 3 3zm0 2c-2.3 0-7 1.2-7 3.5V19h14v-2.5C15 14.2 10.3 13 8 13zm8 0c-.3 0-.6 0-1 .1a4.2 4.2 0 0 1 2 3.4V19h6v-2.5c0-2.3-4.7-3.5-7-3.5z"/></svg>',
-    home: '<svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>',
     palette: '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18 1.5 1.5 0 0 0 1.1-2.5 1.5 1.5 0 0 1 1.1-2.5H16a5 5 0 0 0 5-5c0-4.4-4-8-9-8zm-5.5 9A1.5 1.5 0 1 1 8 10.5 1.5 1.5 0 0 1 6.5 12zm3-4A1.5 1.5 0 1 1 11 6.5 1.5 1.5 0 0 1 9.5 8zm5 0A1.5 1.5 0 1 1 16 6.5 1.5 1.5 0 0 1 14.5 8zm3 4a1.5 1.5 0 1 1 1.5-1.5 1.5 1.5 0 0 1-1.5 1.5z"/></svg>',
     check: '<svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>',
     edit: '<svg viewBox="0 0 24 24"><path d="M3 17.3V21h3.8l11-11.1-3.7-3.7zM20.7 7a1 1 0 0 0 0-1.4l-2.3-2.3a1 1 0 0 0-1.4 0l-1.8 1.8 3.7 3.7z"/></svg>',
@@ -495,8 +490,6 @@
 
   /* background picker */
   .icon-only { width:44px; height:44px; padding:0; justify-content:center; }
-  .home-btn { flex:none; margin-right:-4px; }
-  .home-btn[hidden] { display:none; }
   .bg-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap:12px; }
   .bg-opt { display:flex; flex-direction:column; gap:8px; padding:8px 8px 10px; border-radius:20px; text-align:left; font-size:14px;
     background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); transition: border-color .2s, background .2s; }
@@ -625,7 +618,6 @@
           { name: "height", selector: { text: {} } },
           { name: "ambient_after", selector: { number: { min: 0, max: 900, step: 5, unit_of_measurement: "s", mode: "box" } } },
           { name: "column_width", selector: { number: { min: 180, max: 600, step: 10, unit_of_measurement: "px", mode: "box" } } },
-          { name: "home_path", selector: { text: {} } },
           { name: "background_image", selector: { text: {} } },
           { name: "show_clock", selector: { boolean: {} } },
           { name: "group_by_status", selector: { boolean: {} } },
@@ -634,7 +626,7 @@
           { name: "alert_snooze", selector: { number: { min: 1, max: 240, step: 1, unit_of_measurement: "min", mode: "box" } } },
         ],
         computeLabel: (s) => {
-          const key = { title: "cf_title", height: "cf_height", ambient_after: "cf_ambient", column_width: "cf_column", background_image: "cf_bgimg", show_clock: "cf_clock", group_by_status: "cf_group", alert_overdue: "cf_alert", alert_sound: "cf_sound", alert_snooze: "cf_snooze", home_path: "cf_home" }[s.name];
+          const key = { title: "cf_title", height: "cf_height", ambient_after: "cf_ambient", column_width: "cf_column", background_image: "cf_bgimg", show_clock: "cf_clock", group_by_status: "cf_group", alert_overdue: "cf_alert", alert_sound: "cf_sound", alert_snooze: "cf_snooze" }[s.name];
           return key ? tr(pageLang(), key) : undefined;
         },
       };
@@ -649,7 +641,6 @@
         show_clock: true,
         group_by_status: false,
         background_image: "",
-        home_path: "",
         alert_overdue: true,
         alert_sound: false,
         alert_snooze: 15,
@@ -850,7 +841,6 @@
           <div class="grain"></div>
           <div class="ui">
             <header class="glass">
-              <button class="ghost-btn icon-only home-btn" data-action="home" aria-label="${this._t("home")}" title="${this._t("home")}" hidden>${ICON.home}</button>
               <div class="clock"><div class="time"></div><div class="date"></div></div>
               <div class="title"></div>
               <nav class="filters"></nav>
@@ -886,8 +876,6 @@
       look.setAttribute("aria-label", this._t("bg_colours"));
       look.setAttribute("title", this._t("bg_colours"));
       q('header [data-action="people"]').setAttribute("aria-label", this._t("people"));
-      q('header [data-action="home"]').setAttribute("aria-label", this._t("home"));
-      q('header [data-action="home"]').setAttribute("title", this._t("home"));
       q('header [data-action="people"] span').textContent = this._t("people");
       q('header [data-action="new-task"] span').textContent = this._t("new_task");
       q(".a-hint").textContent = this._t("wake");
@@ -912,7 +900,6 @@
       this.shadowRoot.querySelector(".title").textContent = title || "";
       this.shadowRoot.querySelector(".title").style.display = title ? "" : "none";
       this.shadowRoot.querySelector(".clock").style.display = c.show_clock === false ? "none" : "";
-      this.shadowRoot.querySelector(".home-btn").hidden = !c.home_path;
       const bg = this.shadowRoot.querySelector(".bgimg");
       bg.style.backgroundImage = c.background_image ? `url("${String(c.background_image).replace(/["\\]/g, "")}")` : "";
       this._tick();
@@ -1140,9 +1127,6 @@
         case "look":
           this._openLook();
           break;
-        case "home":
-          this._goHome();
-          break;
         case "t-tap": {
           const t = this._tasks.get(id);
           if (t && (t.status === "due" || t.status === "overdue")) this._openPick(id);
@@ -1160,18 +1144,6 @@
           else if (a.startsWith("e-")) this._onEditorClick(el, a);
           else if (a.startsWith("x-")) this._onAlertClick(el, a);
       }
-    }
-
-    // The Home button: go back to another dashboard, like Home Assistant's own navigate action.
-    _goHome() {
-      const path = String((this._config && this._config.home_path) || "").trim();
-      if (!path) return;
-      if (/^https?:\/\//i.test(path)) {
-        window.location.assign(path);
-        return;
-      }
-      window.history.pushState(null, "", path.startsWith("/") ? path : `/${path}`);
-      window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: false } }));
     }
 
     async _call(msg) {
