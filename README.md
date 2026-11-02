@@ -6,7 +6,7 @@
 
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/docs/faq/custom_repositories)
 [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.11%2B-18BCF2.svg?logo=homeassistant&logoColor=white)](https://www.home-assistant.io/)
-[![Version](https://img.shields.io/badge/version-0.2.0-6E56CF.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.3.0-6E56CF.svg)](CHANGELOG.md)
 [![Languages](https://img.shields.io/badge/languages-English%20%7C%20Deutsch%20%7C%20Espa%C3%B1ol%20%7C%20Fran%C3%A7ais-2E9E6B.svg)](#languages)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -80,6 +80,7 @@ Need more detail? See the full [step-by-step setup](#step-by-step-setup) below.
 | **Tap, pick a face, done** | Tapping a task asks "Who did it?" with everyone's picture. The tile then shows who did it and when. |
 | **Resets on its own** | Every day, several times a day (feed the dog at 8 am *and* 6 pm), on certain weekdays (bins on Tuesday), or every few days counted from when it was last done (water the plants every 3 days). |
 | **Overdue tasks stand out** | After their due time, tiles glow red and the person whose job it is (or everyone) gets a phone reminder. |
+| **Pop-up so nothing is missed** | When a task becomes overdue, a full-screen alert appears on the tablet, even over the ambient clock. Tap **Done** to say who did it, **Remind me in 15 min**, or **Got it**. An optional chime can play too. |
 | **Late still counts** | Feeding the dog at 8:30 counts as the morning feed, not the evening one. |
 | **Ready-made tasks** | Start from eight common jobs, such as feeding the pets, morning pills, bins night and watering the plants. |
 | **History and undo** | See who did each task and when, and undo a tap made by mistake. |
@@ -102,6 +103,10 @@ All pictures are from the board itself, with example tasks.
 <tr>
 <td width="50%" valign="top"><img src="https://raw.githubusercontent.com/Degederon/GlassTaskBoard/main/docs/images/new-task.png" alt="Add a task in four steps, or start from a ready-made one." width="100%"><br><sub>Add a task in four steps, or start from a ready-made one.</sub></td>
 <td width="50%" valign="top"><img src="https://raw.githubusercontent.com/Degederon/GlassTaskBoard/main/docs/images/history.png" alt="Open a task to see its history, undo the last tap or edit it." width="100%"><br><sub>Open a task to see its history, undo the last tap or edit it.</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="https://raw.githubusercontent.com/Degederon/GlassTaskBoard/main/docs/images/overdue-popup.jpg" alt="When a task is overdue, a pop-up makes sure it isn't missed." width="100%"><br><sub>When a task is overdue, a pop-up makes sure it isn't missed.</sub></td>
+<td width="50%" valign="top"></td>
 </tr>
 </table>
 
@@ -169,7 +174,7 @@ After installing or updating, refresh the page once so your browser loads the bo
 If you manage dashboards in YAML (`lovelace: mode: yaml` in `configuration.yaml`), the integration can't edit your resources. It loads the board on every page instead, so it still works. If you prefer to list it yourself, add this under `lovelace: resources:`:
 
 ```yaml
-- url: /glass_tasks/glass-task-board.js?v=0.2.0
+- url: /glass_tasks/glass-task-board.js?v=0.3.0
   type: module
 ```
 
@@ -254,7 +259,7 @@ Available presets: Aurora, Black, Sunset, Ocean, Forest, Lavender, Ember, Graphi
 ### What happens automatically
 
 - **Resetting:** each task comes back on its schedule. A late tap fills the time that was due, not the next one.
-- **Overdue:** once a due time passes, the tile glows red and the reminder is sent once.
+- **Overdue:** once a due time passes, the tile glows red, the reminder is sent once, and a pop-up appears on the board. **Done** asks who did it; if that window is closed without picking anyone, the pop-up comes back. **Remind me in 15 min** hides it for a while; **Got it** hides it until the task's next due time. Each screen remembers this for itself, and the pop-up closes on its own once someone does the task.
 - **Ambient mode:** after 120 seconds without a touch, the board shows a large clock and cycles through what's due. Tap anywhere to wake it.
 
 ## Dashboard configuration
@@ -270,6 +275,9 @@ column_width: 260
 group_by_status: false
 show_clock: true
 background_image: /local/wallpaper.jpg
+alert_overdue: true
+alert_sound: false
+alert_snooze: 15
 ```
 
 | Option | Type | Default | Description |
@@ -281,6 +289,9 @@ background_image: /local/wallpaper.jpg
 | `group_by_status` | boolean | `false` | Shows **To do** tiles first, then **Done**, then **Coming up**, instead of a fixed order. |
 | `show_clock` | boolean | `true` | Shows the clock and date in the header. |
 | `background_image` | string | — | Optional image URL displayed behind the glass. |
+| `alert_overdue` | boolean | `true` | Shows a full-screen pop-up when a task becomes overdue. Turn it off on dashboards for phones or other screens that shouldn't interrupt. |
+| `alert_sound` | boolean | `false` | Plays a soft chime when the pop-up appears. Some browsers only allow sound after the screen has been touched once. |
+| `alert_snooze` | number | `15` | Minutes that **Remind me in…** hides the pop-up for. |
 
 > [!TIP]
 > For a dedicated wall display, run the dashboard in kiosk mode, for example with Fully Kiosk Browser.
@@ -384,6 +395,20 @@ actions:
       entity_id: light.kitchen
     data:
       flash: long
+```
+
+### Wake the tablet screen when a task is overdue
+
+The pop-up appears on the board, but it can't switch a sleeping screen on. This automation does that, for example with Fully Kiosk Browser:
+
+```yaml
+triggers:
+  - trigger: event
+    event_type: glass_tasks_overdue
+actions:
+  - action: switch.turn_on
+    target:
+      entity_id: switch.hallway_tablet_screen
 ```
 
 ### Tick a task off with an NFC tag
@@ -506,6 +531,9 @@ Your browser hasn't loaded the board's display file. Work through these steps in
 | No phone reminders | Open **People**, edit the person and check that a phone is selected. For Home Assistant `person` entities, check **Settings → Devices & services → Glass Task Board → Configure**. Also check that the task's reminders aren't switched off under **More options**. |
 | A phone is missing from the list | Install the Home Assistant app on that phone and sign in, then reopen the People screen. |
 | A task tapped by mistake | Select **⋮** on the tile, then **Undo last**. |
+| The overdue pop-up doesn't appear | Check that `alert_overdue` isn't set to `false` on that card, and that you didn't select **Got it** for this due time on that screen. The pop-up waits while someone is picking a name or editing a task. |
+| The pop-up shows on my phone too | Add `alert_overdue: false` to the board card on your phone's dashboard. |
+| No chime | Set `alert_sound: true`. Browsers only allow sound after the screen has been touched once since the page loaded; tap the board once after it starts. |
 | A task shows as done at the wrong time | Check Home Assistant's time zone under **Settings → System → General**. Due times use Home Assistant's time zone. |
 | The Marketplace doesn't offer an update | Open **Glass Task Board** in the Marketplace, open the **⋮** menu and choose **Update information**. Updates appear once a new release is published on GitHub. |
 | The board still looks like the old version after an update | Restart Home Assistant, then hard-refresh the browser or reset the companion app's frontend cache. The integration updates the version number in your resources automatically. |

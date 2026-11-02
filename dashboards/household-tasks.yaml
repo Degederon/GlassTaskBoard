@@ -20,6 +20,9 @@ views:
         ambient_after: 120
         column_width: 260
         show_clock: true
+        alert_overdue: true
+        alert_sound: false
+        alert_snooze: 15
 
   - title: Today
     path: today

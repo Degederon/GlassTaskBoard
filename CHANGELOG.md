@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.3.0] - 2026-11-02
+
+### Added
+
+- An overdue pop-up, so tasks aren't missed. When a task becomes overdue, a full-screen glass alert appears on the board, even over the ambient clock, listing everything that's overdue. **Done** asks who did it (closing that without picking anyone brings the alert back), **Remind me in 15 min** snoozes it, and **Got it** hides it until the task's next due time. It closes on its own once someone does the task, on any screen. Available in English, German, Spanish and French.
+- Card options `alert_overdue` (on by default), `alert_sound` (a soft chime, off by default) and `alert_snooze` (minutes, 15 by default).
+- An automation example in the README that wakes a sleeping tablet screen when a task becomes overdue.
+
 ## [0.2.0] - 2026-11-02
 
 ### Added

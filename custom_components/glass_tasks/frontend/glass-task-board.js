@@ -5,7 +5,7 @@
  * No build step, no dependencies. Served automatically by the glass_tasks integration.
  */
 (() => {
-  const VERSION = "0.2.0";
+  const VERSION = "0.3.0";
   const TAG = "glass-task-board";
   if (customElements.get(TAG)) return;
 
@@ -44,6 +44,7 @@
   // in the viewer's Home Assistant profile; anything missing falls back to English.
   const STRINGS = {
     en: {
+      alert_title: "Don't forget", alert_one: "This task is overdue.", alert_many: "{n} tasks are overdue.", alert_done: "Done", alert_snooze: "Remind me in {n} min", alert_ok: "Got it", cf_alert: "Pop up overdue tasks on this screen", cf_sound: "Play a chime with the pop-up", cf_snooze: "Remind again after (minutes)",
       bg_aurora: "Aurora", bg_black: "Black", bg_sunset: "Sunset", bg_ocean: "Ocean", bg_forest: "Forest", bg_lavender: "Lavender",
       bg_ember: "Ember", bg_graphite: "Graphite", bg_midnight: "Midnight", bg_halloween: "Halloween", bg_festive: "Festive", tint_clear: "clear",
       tint_rose: "rose", tint_amber: "amber", tint_mint: "mint", tint_sky: "sky", tint_violet: "violet", cf_title: "Title", cf_height: "Height (CSS, e.g. 100vh or 720px)",
@@ -81,6 +82,7 @@
       notify_label: "Remind them on their phone when their task is overdue", on_board: "On the board", ha_on: "These people from Home Assistant are also on the board.",
     },
     de: {
+      alert_title: "Nicht vergessen", alert_one: "Diese Aufgabe ist überfällig.", alert_many: "{n} Aufgaben sind überfällig.", alert_done: "Erledigt", alert_snooze: "In {n} Min. erinnern", alert_ok: "Verstanden", cf_alert: "Überfällige Aufgaben auf diesem Bildschirm einblenden", cf_sound: "Beim Einblenden einen Ton abspielen", cf_snooze: "Erneut erinnern nach (Minuten)",
       bg_aurora: "Polarlicht", bg_black: "Schwarz", bg_sunset: "Sonnenuntergang", bg_ocean: "Ozean", bg_forest: "Wald", bg_lavender: "Lavendel",
       bg_ember: "Glut", bg_graphite: "Graphit", bg_midnight: "Mitternacht", bg_halloween: "Halloween", bg_festive: "Festlich",
       tint_clear: "klar", tint_rose: "rosa", tint_amber: "bernstein", tint_mint: "mint", tint_sky: "himmelblau", tint_violet: "violett",
@@ -124,6 +126,7 @@
       notify_label: "Auf dem Handy erinnern, wenn ihre Aufgabe überfällig ist", on_board: "Auf der Tafel", ha_on: "Diese Personen aus Home Assistant sind auch auf der Tafel.",
     },
     es: {
+      alert_title: "No lo olvides", alert_one: "Esta tarea está atrasada.", alert_many: "Hay {n} tareas atrasadas.", alert_done: "Hecha", alert_snooze: "Recuérdamelo en {n} min", alert_ok: "Entendido", cf_alert: "Mostrar las tareas atrasadas en esta pantalla", cf_sound: "Hacer sonar un aviso al mostrarlas", cf_snooze: "Volver a recordar tras (minutos)",
       bg_aurora: "Aurora", bg_black: "Negro", bg_sunset: "Atardecer", bg_ocean: "Océano", bg_forest: "Bosque", bg_lavender: "Lavanda",
       bg_ember: "Brasa", bg_graphite: "Grafito", bg_midnight: "Medianoche", bg_halloween: "Halloween", bg_festive: "Festivo", tint_clear: "transparente",
       tint_rose: "rosa", tint_amber: "ámbar", tint_mint: "menta", tint_sky: "cielo", tint_violet: "violeta", cf_title: "Título",
@@ -164,6 +167,7 @@
       notify_label: "Avisar en su móvil cuando su tarea esté atrasada", on_board: "En el tablero", ha_on: "Estas personas de Home Assistant también están en el tablero.",
     },
     fr: {
+      alert_title: "N'oubliez pas", alert_one: "Cette tâche est en retard.", alert_many: "{n} tâches sont en retard.", alert_done: "Fait", alert_snooze: "Me le rappeler dans {n} min", alert_ok: "Compris", cf_alert: "Afficher les tâches en retard sur cet écran", cf_sound: "Jouer un carillon à l'affichage", cf_snooze: "Rappeler à nouveau après (minutes)",
       bg_aurora: "Aurore", bg_black: "Noir", bg_sunset: "Coucher de soleil", bg_ocean: "Océan", bg_forest: "Forêt", bg_lavender: "Lavande",
       bg_ember: "Braise", bg_graphite: "Graphite", bg_midnight: "Minuit", bg_halloween: "Halloween", bg_festive: "Festif", tint_clear: "transparent",
       tint_rose: "rose", tint_amber: "ambre", tint_mint: "menthe", tint_sky: "ciel", tint_violet: "violet", cf_title: "Titre",
@@ -239,6 +243,7 @@
     return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
   };
   const LAST_DOER_KEY = "glass-task-board:last-doer";
+  const ALERT_KEY = "glass-task-board:alert-";
   const storage = {
     get(k) {
       try {
@@ -388,6 +393,24 @@
   .actions button { display:inline-flex; align-items:center; gap:8px; padding: 11px 18px; border-radius:999px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18); font-size:15px; }
   .actions button.danger { color:#ffc2d1; }
   .actions svg { font-size:18px; }
+
+  /* overdue pop-up */
+  .alert-scrim { z-index: 8; background: rgba(28,4,14,.5); }
+  .alert { width: min(640px, 100%); max-height:100%; overflow:auto; padding: 28px 28px 22px; text-align:center; scrollbar-width:none;
+    border-color: rgba(${OVERDUE_TINT}, .55); animation: pop .35s cubic-bezier(.2,.9,.25,1.1) both, glow 2.6s ease-in-out .35s infinite; }
+  .alert.settled { animation: glow 2.6s ease-in-out infinite; }
+  .alert .bell { font-size: 56px; line-height:1; display:inline-block; animation: ring 1.4s ease-in-out .3s 2; }
+  .alert h2 { margin: 12px 0 4px; font-size: 30px; font-weight:600; }
+  .alert .lead { margin:0; }
+  @keyframes ring { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(16deg); } 30% { transform: rotate(-14deg); } 45% { transform: rotate(10deg); } 60% { transform: rotate(-6deg); } 75% { transform: rotate(3deg); } }
+  .alert-list { list-style:none; margin: 20px 0 0; padding:0; display:grid; gap:10px; text-align:left; }
+  .alert-list li { display:flex; align-items:center; gap:14px; padding: 12px 12px 12px 14px; border-radius: 22px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); }
+  .alert-list .t-icon { width:52px; height:52px; font-size:32px; flex:none; }
+  .alert-list .t-body { flex:1; min-width:0; }
+  .alert-list .t-title { font-size: 19px; }
+  .alert .sheet-foot { justify-content:flex-end; flex-wrap:wrap; }
+  .primary.sm { padding: 11px 20px; font-size:15px; flex:none; }
 
   /* ambient */
   .ambient { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 6vh 6vw; text-align:center;
@@ -598,9 +621,12 @@
           { name: "background_image", selector: { text: {} } },
           { name: "show_clock", selector: { boolean: {} } },
           { name: "group_by_status", selector: { boolean: {} } },
+          { name: "alert_overdue", selector: { boolean: {} } },
+          { name: "alert_sound", selector: { boolean: {} } },
+          { name: "alert_snooze", selector: { number: { min: 1, max: 240, step: 1, unit_of_measurement: "min", mode: "box" } } },
         ],
         computeLabel: (s) => {
-          const key = { title: "cf_title", height: "cf_height", ambient_after: "cf_ambient", column_width: "cf_column", background_image: "cf_bgimg", show_clock: "cf_clock", group_by_status: "cf_group" }[s.name];
+          const key = { title: "cf_title", height: "cf_height", ambient_after: "cf_ambient", column_width: "cf_column", background_image: "cf_bgimg", show_clock: "cf_clock", group_by_status: "cf_group", alert_overdue: "cf_alert", alert_sound: "cf_sound", alert_snooze: "cf_snooze" }[s.name];
           return key ? tr(pageLang(), key) : undefined;
         },
       };
@@ -615,6 +641,9 @@
         show_clock: true,
         group_by_status: false,
         background_image: "",
+        alert_overdue: true,
+        alert_sound: false,
+        alert_snooze: 15,
         ...config,
       };
       if (this._built) {
@@ -653,12 +682,14 @@
       this._tick();
       this._clockTimer = setInterval(() => this._tick(), 15000);
       this._relTimer = setInterval(() => this._renderBoard(), 60000);
+      this._alertTimer = setInterval(() => this._checkAlerts(), 30000);
       this._resetIdle();
     }
 
     disconnectedCallback() {
       clearInterval(this._clockTimer);
       clearInterval(this._relTimer);
+      clearInterval(this._alertTimer);
       clearInterval(this._spotTimer);
       clearTimeout(this._idleTimer);
       if (this._unsub) {
@@ -721,6 +752,7 @@
         if (this._pickId) this._renderPick();
         if (this._peopleUi) this._renderPeople();
       }
+      this._checkAlerts();
     }
 
     _flash(id) {
@@ -795,7 +827,7 @@
     }
 
     _anySheet() {
-      return !!(this._editor || this._pickId || this._openId || this._peopleUi || this._lookUi);
+      return !!(this._editor || this._pickId || this._openId || this._peopleUi || this._lookUi || this._alertOpen);
     }
 
     // ------------------------------------------------------------- render
@@ -828,6 +860,7 @@
           <div class="scrim editor-scrim" hidden></div>
           <div class="scrim people-scrim" hidden></div>
           <div class="scrim look-scrim" hidden></div>
+          <div class="scrim alert-scrim" hidden></div>
         </div>`;
       const root = this.shadowRoot.querySelector(".root");
       root.addEventListener("click", (e) => this._onClick(e));
@@ -855,6 +888,7 @@
       if (this._pickId) this._renderPick();
       if (this._openId) this._renderDetail();
       if (this._peopleUi) this._renderPeople();
+      if (this._alertOpen) this._renderAlert(true);
     }
 
     _applyConfig() {
@@ -1108,6 +1142,7 @@
           else if (a.startsWith("k-")) this._onPickClick(el, a);
           else if (a.startsWith("d-")) this._onDetailClick(el, a);
           else if (a.startsWith("e-")) this._onEditorClick(el, a);
+          else if (a.startsWith("x-")) this._onAlertClick(el, a);
       }
     }
 
@@ -1164,6 +1199,7 @@
     _closePick() {
       this._pickId = null;
       this._hideScrim("pick-scrim");
+      this._checkAlerts();
     }
 
     _suggestedDoer(t) {
@@ -1328,6 +1364,7 @@
     _closeEditor() {
       this._editor = null;
       this._hideScrim("editor-scrim");
+      this._checkAlerts();
     }
 
     _addTime(value) {
@@ -1807,6 +1844,151 @@
           break;
       }
       this._renderPeople();
+    }
+
+    // ------------------------------------------------------- overdue pop-up
+    // When a task becomes overdue, a full-screen alert appears so it isn't missed.
+    // Each screen remembers what was dismissed ("Got it") or snoozed, per due time,
+    // so the alert comes back for the next due time but not for this one.
+    _alertState(kind) {
+      try {
+        return JSON.parse(storage.get(ALERT_KEY + kind) || "{}") || {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    _saveAlertState(kind, data) {
+      const kept = Object.fromEntries(Object.entries(data).filter(([id]) => this._tasks.has(id)));
+      storage.set(ALERT_KEY + kind, JSON.stringify(kept));
+    }
+
+    _snoozeMinutes() {
+      return Math.min(240, Math.max(1, Number(this._config && this._config.alert_snooze) || 15));
+    }
+
+    _alertCandidates() {
+      if (!this._loaded || (this._config && this._config.alert_overdue === false)) return [];
+      const ack = this._alertState("ack");
+      const snooze = this._alertState("snooze");
+      const now = Date.now();
+      return this._sorted()
+        .filter((t) => t.status === "overdue" && ack[t.id] !== t.period_start && !(Number(snooze[t.id]) > now))
+        .sort((a, b) => String(a.due_at || "~").localeCompare(String(b.due_at || "~")));
+    }
+
+    _checkAlerts() {
+      if (!this._built) return;
+      // Don't interrupt someone who is picking a name or editing; check again when they finish.
+      if (this._pickId || this._editor) return;
+      const list = this._alertCandidates();
+      if (!list.length) {
+        if (this._alertOpen) this._closeAlert();
+        return;
+      }
+      const sig = list.map((t) => `${t.id}@${t.period_start}`).join("|");
+      if (this._alertOpen && sig === this._alertSig) return;
+      this._alertSeen = this._alertSeen || new Set();
+      const fresh = list.some((t) => !this._alertSeen.has(`${t.id}@${t.period_start}`));
+      list.forEach((t) => this._alertSeen.add(`${t.id}@${t.period_start}`));
+      const wasOpen = this._alertOpen;
+      this._alertSig = sig;
+      this._alertIds = list.map((t) => t.id);
+      this._alertOpen = true;
+      if (this._ambient) this._setAmbient(false);
+      this._renderAlert(wasOpen);
+      if (fresh && this._config && this._config.alert_sound) this._chime();
+    }
+
+    _renderAlert(settled = false) {
+      const scrim = this.shadowRoot.querySelector(".alert-scrim");
+      const tasks = (this._alertIds || []).map((id) => this._tasks.get(id)).filter(Boolean);
+      if (!scrim || !tasks.length) return;
+      scrim.hidden = false;
+      scrim.onclick = null; // a tap beside the alert doesn't dismiss it
+      const whose = (t) => (!t.assignee || t.assignee === "everyone" ? this._t("everyones_job") : this._t("job", { name: this._person(t.assignee, this._t("someone")).name }));
+      scrim.innerHTML = `
+        <div class="alert glass${settled ? " settled" : ""}" role="alertdialog" aria-live="assertive" style="--tint:${OVERDUE_TINT}">
+          <span class="bell" aria-hidden="true">⏰</span>
+          <h2>${esc(this._t("alert_title"))}</h2>
+          <p class="lead">${esc(tasks.length > 1 ? this._t("alert_many", { n: tasks.length }) : this._t("alert_one"))}</p>
+          <ul class="alert-list">
+            ${tasks
+              .map(
+                (t) => `<li>
+              <span class="t-icon">${esc(t.icon || "✅")}</span>
+              <span class="t-body"><span class="t-title">${esc(t.title)}</span><span class="t-status">${this._statusText(t)} · ${esc(whose(t))}</span></span>
+              <button class="primary sm" data-action="x-done" data-id="${esc(t.id)}">${ICON.check}<span>${esc(this._t("alert_done"))}</span></button>
+            </li>`
+              )
+              .join("")}
+          </ul>
+          <div class="sheet-foot">
+            <button class="ghost-btn" data-action="x-snooze">${ICON.clock}<span>${esc(this._t("alert_snooze", { n: this._snoozeMinutes() }))}</span></button>
+            <button class="ghost-btn" data-action="x-ok">${ICON.check}<span>${esc(this._t("alert_ok"))}</span></button>
+          </div>
+        </div>`;
+    }
+
+    _closeAlert() {
+      this._alertOpen = false;
+      this._alertSig = "";
+      const scrim = this.shadowRoot.querySelector(".alert-scrim");
+      if (scrim) {
+        scrim.hidden = true;
+        scrim.innerHTML = "";
+      }
+      this._resetIdle();
+    }
+
+    _onAlertClick(el, a) {
+      const ids = this._alertIds || [];
+      if (a === "x-done") {
+        // Ask who did it. If the window is closed without an answer, the alert comes back.
+        const id = el.dataset.id;
+        this._closeAlert();
+        this._openPick(id);
+        return;
+      }
+      if (a === "x-snooze") {
+        const snooze = this._alertState("snooze");
+        const until = Date.now() + this._snoozeMinutes() * 60000;
+        ids.forEach((id) => (snooze[id] = until));
+        this._saveAlertState("snooze", snooze);
+      } else if (a === "x-ok") {
+        const ack = this._alertState("ack");
+        ids.forEach((id) => {
+          const t = this._tasks.get(id);
+          if (t) ack[id] = t.period_start;
+        });
+        this._saveAlertState("ack", ack);
+      }
+      this._closeAlert();
+    }
+
+    _chime() {
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        this._audio = this._audio || new Ctx();
+        const ac = this._audio;
+        if (ac.state === "suspended") ac.resume();
+        [[880, 0], [660, 0.32], [880, 0.64]].forEach(([freq, at]) => {
+          const osc = ac.createOscillator();
+          const gain = ac.createGain();
+          const t0 = ac.currentTime + at;
+          osc.type = "sine";
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.0001, t0);
+          gain.gain.exponentialRampToValueAtTime(0.22, t0 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.9);
+          osc.connect(gain).connect(ac.destination);
+          osc.start(t0);
+          osc.stop(t0 + 1);
+        });
+      } catch (e) {
+        /* sound unavailable */
+      }
     }
 
     // ------------------------------------------------------------ ambient
