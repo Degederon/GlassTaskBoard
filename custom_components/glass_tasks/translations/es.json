@@ -1,0 +1,118 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Glass Task Board",
+        "description": "Añade un tablero para las tareas de casa que se repiten. La tarjeta de cristal se carga automáticamente: añádela a un panel como «Glass Task Board»."
+      }
+    },
+    "abort": {
+      "already_configured": "El tablero de tareas ya está configurado.",
+      "single_instance_allowed": "El tablero de tareas ya está configurado."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Recordatorios de tareas atrasadas",
+        "description": "Para cada persona, elige los servicios de notificación que le avisarán cuando una de sus tareas esté atrasada (por ejemplo notify.mobile_app_pixel). Las tareas de «Todos» avisan a todas las personas de abajo. Las personas añadidas en el propio tablero se configuran en la pantalla Personas de la tarjeta.",
+        "data": {
+          "notify_everyone": "Servicios adicionales para las tareas de todos",
+          "notify_url": "Abrir esta ruta del panel al tocar un recordatorio (p. ej. /lovelace/tasks)"
+        }
+      }
+    }
+  },
+  "services": {
+    "complete": {
+      "name": "Marcar tarea como hecha",
+      "description": "Marca una tarea como hecha, como si alguien la tocara en el tablero.",
+      "fields": {
+        "task": {
+          "name": "Tarea",
+          "description": "El nombre de la tarea (por ejemplo «Dar de comer al perro») o su id."
+        },
+        "by": {
+          "name": "Hecha por",
+          "description": "La persona que la hizo (una entidad de persona o el id de un miembro del tablero). Déjalo vacío para usar a quien ejecuta la acción."
+        }
+      }
+    },
+    "undo": {
+      "name": "Deshacer la última vez",
+      "description": "Anula la última vez que se marcó una tarea como hecha.",
+      "fields": {
+        "task": {
+          "name": "Tarea",
+          "description": "El nombre o el id de la tarea."
+        }
+      }
+    },
+    "add_task": {
+      "name": "Añadir tarea",
+      "description": "Añade una tarea que se repite al tablero.",
+      "fields": {
+        "title": {
+          "name": "Nombre",
+          "description": "Qué hay que hacer, por ejemplo «Regar las plantas»."
+        },
+        "icon": {
+          "name": "Icono",
+          "description": "Un emoji para la ficha."
+        },
+        "repeat": {
+          "name": "Se repite",
+          "description": "Todos los días, ciertos días de la semana o cada pocos días contados desde la última vez."
+        },
+        "days": {
+          "name": "Días de la semana",
+          "description": "Para «ciertos días». 0 es lunes, 6 es domingo."
+        },
+        "every_days": {
+          "name": "Cada cuántos días",
+          "description": "Para «cada pocos días»."
+        },
+        "times": {
+          "name": "Antes de",
+          "description": "Una o varias horas del día, como 08:00 y 18:00. Déjalo vacío para «cuando sea ese día»."
+        },
+        "assignee": {
+          "name": "De quién es la tarea",
+          "description": "everyone, una entidad de persona o el id de un miembro del tablero."
+        },
+        "tint": {
+          "name": "Color",
+          "description": "El color de la ficha."
+        },
+        "notify": {
+          "name": "Avisar si se atrasa",
+          "description": "Enviar recordatorios al móvil cuando la tarea esté atrasada."
+        }
+      }
+    },
+    "delete_task": {
+      "name": "Quitar tarea",
+      "description": "Quita una tarea del tablero.",
+      "fields": {
+        "task": {
+          "name": "Tarea",
+          "description": "El nombre o el id de la tarea."
+        }
+      }
+    },
+    "set_background": {
+      "name": "Cambiar el fondo",
+      "description": "Cambia el tema de color del tablero en todas las pantallas. Usa un tema predefinido o «custom» con tres colores.",
+      "fields": {
+        "preset": {
+          "name": "Tema",
+          "description": "Uno de los once temas o «custom»."
+        },
+        "colors": {
+          "name": "Colores propios",
+          "description": "Tres colores para «custom», como «#3366ff, #ff66aa, #22ccbb»."
+        }
+      }
+    }
+  }
+}

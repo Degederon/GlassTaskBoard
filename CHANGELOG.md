@@ -1,11 +1,36 @@
 # Changelog
 
-## 0.1.1
+All notable changes to this project are documented in this file.
+
+## [0.2.0] - 2026-11-02
+
+### Added
+
+- German, Spanish and French. The board's buttons, task status and schedules, the task form and its ready-made tasks, background names, People screen, ambient screen and card settings follow each person's Home Assistant language; the setup and options screens, the actions and phone reminders follow Home Assistant's language. English is unchanged.
+- The integration now adds the board to **Settings → Dashboards → Resources** automatically and updates its version number after every update, so tablets always load the current board. An entry added by hand is updated rather than duplicated. Dashboards in YAML mode get the board loaded on every page instead.
+
+### Changed
+
+- The README now follows the same layout as Glass Message Board: a step-by-step setup, a picture tour, tables for options, actions, sensors and events, a Languages section with pictures of the board in each language, and troubleshooting.
+
+### Fixed
+
+- The Who did it?, task, editor, People and Background windows no longer flicker when you tap inside them. They now animate only when they first open.
+- On narrow screens, filter buttons no longer squeeze their text onto two lines.
+- Tasks without a due time no longer say "Next: tomorrow 12:00 AM"; they say "Next: tomorrow".
+
+## [0.1.1] - 2026-11-01
+
+### Added
+
 - An app icon: a frosted-glass tile with a green tick and a repeat arrow. It appears next to Glass Task Board in the Marketplace and on the Devices & services page (Home Assistant 2026.3 or later).
 
-## 0.1.0
+## [0.1.0] - 2026-10-31
+
+### Added
+
 - First release: recurring household tasks on a frosted-glass board.
 - Tap a task and pick who did it; it resets on its own schedule (daily, several times a day, certain weekdays, or every few days).
 - Overdue tiles glow and send phone reminders.
 - History with undo, per-person filters, ambient clock mode and colour themes.
-- A sensor for every task, plus services and events for automations.
+- A sensor for every task, plus actions and events for automations.

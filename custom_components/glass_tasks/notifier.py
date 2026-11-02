@@ -14,6 +14,25 @@ from .const import CONF_NOTIFY_EVERYONE, CONF_NOTIFY_URL, DOMAIN, EVERYONE, MEMB
 
 _LOGGER = logging.getLogger(__name__)
 
+# The reminder's own words, in Home Assistant's language (English otherwise).
+_DUE_AT = {
+    "en": "It was due at {time}.",
+    "de": "Sie war um {time} fällig.",
+    "es": "Tocaba a las {time}.",
+    "fr": "Elle était prévue à {time}.",
+}
+_NOT_DONE = {
+    "en": "It hasn't been done yet.",
+    "de": "Sie ist noch nicht erledigt.",
+    "es": "Todavía no se ha hecho.",
+    "fr": "Elle n'a pas encore été faite.",
+}
+
+
+def _language(hass: HomeAssistant) -> str:
+    lang = str(getattr(hass.config, "language", None) or "en").split("-")[0].lower()
+    return lang if lang in _DUE_AT else "en"
+
 
 def _as_list(value: Any) -> list[str]:
     if not value:
@@ -44,10 +63,12 @@ def _targets(hass: HomeAssistant, entry: ConfigEntry, assignee: str) -> set[str]
     return targets
 
 
-def _clock(iso: str | None) -> str:
+def _clock(iso: str | None, lang: str = "en") -> str:
     if not iso:
         return ""
     when = dt_util.as_local(datetime.fromisoformat(iso))
+    if lang != "en":
+        return f"{when.hour}:{when.minute:02d}"
     return when.strftime("%-I:%M %p").lower() if when.minute else when.strftime("%-I %p").lower()
 
 
@@ -58,8 +79,9 @@ async def async_send_overdue(hass: HomeAssistant, entry: ConfigEntry, task: dict
     targets = _targets(hass, entry, task.get("assignee") or EVERYONE)
     if not targets:
         return
-    due = _clock(task.get("due_at"))
-    body = f"It was due at {due}." if due else "It hasn't been done yet."
+    lang = _language(hass)
+    due = _clock(task.get("due_at"), lang)
+    body = _DUE_AT[lang].format(time=due) if due else _NOT_DONE[lang]
     data: dict[str, Any] = {"tag": f"glass-tasks-{task['id']}", "group": DOMAIN}
     if url := entry.options.get(CONF_NOTIFY_URL):
         data["url"] = url

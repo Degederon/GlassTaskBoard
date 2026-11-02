@@ -1,0 +1,118 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Glass Task Board",
+        "description": "Ajoute un tableau pour les tâches ménagères récurrentes. La carte en verre se charge automatiquement : ajoutez-la à un tableau de bord sous le nom « Glass Task Board »."
+      }
+    },
+    "abort": {
+      "already_configured": "Le tableau des tâches est déjà configuré.",
+      "single_instance_allowed": "Le tableau des tâches est déjà configuré."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Rappels de retard",
+        "description": "Pour chaque personne, choisissez le ou les services de notification qui lui rappellent qu'une de ses tâches est en retard (par exemple notify.mobile_app_pixel). Les tâches de « Tout le monde » rappellent chaque personne ci-dessous. Les personnes ajoutées sur le tableau lui-même se configurent dans l'écran Personnes de la carte.",
+        "data": {
+          "notify_everyone": "Services supplémentaires pour les tâches de tout le monde",
+          "notify_url": "Ouvrir ce chemin du tableau de bord quand on touche un rappel (par ex. /lovelace/tasks)"
+        }
+      }
+    }
+  },
+  "services": {
+    "complete": {
+      "name": "Marquer la tâche comme faite",
+      "description": "Marque une tâche comme faite, comme si quelqu'un l'avait touchée sur le tableau.",
+      "fields": {
+        "task": {
+          "name": "Tâche",
+          "description": "Le nom de la tâche (par exemple « Nourrir le chien ») ou son id."
+        },
+        "by": {
+          "name": "Faite par",
+          "description": "La personne qui l'a faite (une entité personne ou l'id d'un membre du tableau). Laissez vide pour utiliser la personne qui lance l'action."
+        }
+      }
+    },
+    "undo": {
+      "name": "Annuler le dernier « fait »",
+      "description": "Annule la dernière fois qu'une tâche a été marquée comme faite.",
+      "fields": {
+        "task": {
+          "name": "Tâche",
+          "description": "Le nom ou l'id de la tâche."
+        }
+      }
+    },
+    "add_task": {
+      "name": "Ajouter une tâche",
+      "description": "Ajoute une tâche récurrente au tableau.",
+      "fields": {
+        "title": {
+          "name": "Nom",
+          "description": "Ce qu'il faut faire, par exemple « Arroser les plantes »."
+        },
+        "icon": {
+          "name": "Icône",
+          "description": "Un emoji pour la tuile."
+        },
+        "repeat": {
+          "name": "Répétition",
+          "description": "Tous les jours, certains jours de la semaine, ou tous les quelques jours à compter de la dernière fois."
+        },
+        "days": {
+          "name": "Jours de la semaine",
+          "description": "Pour « certains jours ». 0 est lundi, 6 est dimanche."
+        },
+        "every_days": {
+          "name": "Tous les combien de jours",
+          "description": "Pour « tous les quelques jours »."
+        },
+        "times": {
+          "name": "Avant",
+          "description": "Une ou plusieurs heures, comme 08:00 et 18:00. Laissez vide pour « n'importe quand ce jour-là »."
+        },
+        "assignee": {
+          "name": "Qui s'en charge",
+          "description": "everyone, une entité personne ou l'id d'un membre du tableau."
+        },
+        "tint": {
+          "name": "Couleur",
+          "description": "La couleur de la tuile."
+        },
+        "notify": {
+          "name": "Rappeler en cas de retard",
+          "description": "Envoyer des rappels sur les téléphones quand la tâche est en retard."
+        }
+      }
+    },
+    "delete_task": {
+      "name": "Retirer une tâche",
+      "description": "Retire une tâche du tableau.",
+      "fields": {
+        "task": {
+          "name": "Tâche",
+          "description": "Le nom ou l'id de la tâche."
+        }
+      }
+    },
+    "set_background": {
+      "name": "Changer le fond",
+      "description": "Change le thème de couleur du tableau sur chaque écran. Utilisez un thème prédéfini ou « custom » avec trois couleurs.",
+      "fields": {
+        "preset": {
+          "name": "Thème",
+          "description": "L'un des onze thèmes ou « custom »."
+        },
+        "colors": {
+          "name": "Couleurs personnalisées",
+          "description": "Trois couleurs pour « custom », comme « #3366ff, #ff66aa, #22ccbb »."
+        }
+      }
+    }
+  }
+}

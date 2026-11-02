@@ -22,5 +22,97 @@
         }
       }
     }
+  },
+  "services": {
+    "complete": {
+      "name": "Mark task done",
+      "description": "Mark a task as done, as if someone tapped it on the board.",
+      "fields": {
+        "task": {
+          "name": "Task",
+          "description": "The task's name (for example \"Feed the dog\") or its id."
+        },
+        "by": {
+          "name": "Done by",
+          "description": "The person who did it (a person entity or a board member id). Leave empty to use whoever ran this."
+        }
+      }
+    },
+    "undo": {
+      "name": "Undo last done",
+      "description": "Take back the most recent time a task was marked done.",
+      "fields": {
+        "task": {
+          "name": "Task",
+          "description": "The task's name or id."
+        }
+      }
+    },
+    "add_task": {
+      "name": "Add task",
+      "description": "Add a recurring task to the board.",
+      "fields": {
+        "title": {
+          "name": "Name",
+          "description": "What needs doing, for example \"Water the plants\"."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "An emoji for the tile."
+        },
+        "repeat": {
+          "name": "Repeats",
+          "description": "Every day, on certain days of the week, or every few days counted from when it was last done."
+        },
+        "days": {
+          "name": "Days of the week",
+          "description": "For \"certain days\". 0 is Monday, 6 is Sunday."
+        },
+        "every_days": {
+          "name": "Every how many days",
+          "description": "For \"every few days\"."
+        },
+        "times": {
+          "name": "Due by",
+          "description": "One or more times of day, like 08:00 and 18:00. Leave empty for \"any time that day\"."
+        },
+        "assignee": {
+          "name": "Whose job",
+          "description": "everyone, a person entity or a board member id."
+        },
+        "tint": {
+          "name": "Colour",
+          "description": "The tile's colour."
+        },
+        "notify": {
+          "name": "Remind when overdue",
+          "description": "Send phone reminders when the task is overdue."
+        }
+      }
+    },
+    "delete_task": {
+      "name": "Remove task",
+      "description": "Remove a task from the board.",
+      "fields": {
+        "task": {
+          "name": "Task",
+          "description": "The task's name or id."
+        }
+      }
+    },
+    "set_background": {
+      "name": "Set background",
+      "description": "Switch the board's colour theme on every screen. Use a preset, or \"custom\" with three colours.",
+      "fields": {
+        "preset": {
+          "name": "Theme",
+          "description": "One of the eleven presets, or \"custom\"."
+        },
+        "colors": {
+          "name": "Custom colours",
+          "description": "Three colours for \"custom\", like \"#3366ff, #ff66aa, #22ccbb\"."
+        }
+      }
+    }
   }
 }

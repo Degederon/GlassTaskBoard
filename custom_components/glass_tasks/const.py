@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 DOMAIN = "glass_tasks"
-VERSION = "0.1.1"
+VERSION = "0.2.0"
 
 STORAGE_KEY = f"{DOMAIN}.board"
 STORAGE_VERSION = 1

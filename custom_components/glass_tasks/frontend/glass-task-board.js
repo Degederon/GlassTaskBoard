@@ -5,7 +5,7 @@
  * No build step, no dependencies. Served automatically by the glass_tasks integration.
  */
 (() => {
-  const VERSION = "0.1.1";
+  const VERSION = "0.2.0";
   const TAG = "glass-task-board";
   if (customElements.get(TAG)) return;
 
@@ -25,35 +25,210 @@
   const TASK_ICONS = ["✅", "🐶", "🐱", "🐟", "🐾", "💊", "🪴", "🗑️", "♻️", "🍽️", "🧺", "🧹", "🛏️", "🚿", "🦷", "🍳", "🥣", "🧃", "📚", "🎒", "🚗", "📬", "💡", "🔒", "🔋", "🌙", "☀️", "🏃", "💧", "🧼"];
   // Ready-made tasks for a quick start. Times are "HH:MM".
   const PRESETS = [
-    { icon: "🐶", title: "Feed the dog", repeat: "daily", times: ["08:00", "18:00"] },
-    { icon: "🐱", title: "Feed the cat", repeat: "daily", times: ["08:00", "18:00"] },
-    { icon: "💊", title: "Morning pills", repeat: "daily", times: ["09:00"] },
-    { icon: "🗑️", title: "Take out the bins", repeat: "weekly", days: [1], times: ["20:00"] },
-    { icon: "🪴", title: "Water the plants", repeat: "every", every_days: 3, times: [] },
-    { icon: "🍽️", title: "Empty the dishwasher", repeat: "daily", times: [] },
-    { icon: "🦷", title: "Brush teeth", repeat: "daily", times: ["08:00", "20:00"] },
-    { icon: "🛏️", title: "Make the bed", repeat: "daily", times: ["10:00"] },
+    { icon: "🐶", key: "pr_dog", repeat: "daily", times: ["08:00", "18:00"] },
+    { icon: "🐱", key: "pr_cat", repeat: "daily", times: ["08:00", "18:00"] },
+    { icon: "💊", key: "pr_pills", repeat: "daily", times: ["09:00"] },
+    { icon: "🗑️", key: "pr_bins", repeat: "weekly", days: [1], times: ["20:00"] },
+    { icon: "🪴", key: "pr_plants", repeat: "every", every_days: 3, times: [] },
+    { icon: "🍽️", key: "pr_dishwasher", repeat: "daily", times: [] },
+    { icon: "🦷", key: "pr_teeth", repeat: "daily", times: ["08:00", "20:00"] },
+    { icon: "🛏️", key: "pr_bed", repeat: "daily", times: ["10:00"] },
   ];
   const QUICK_TIMES = [
-    { t: "08:00", label: "Morning" },
-    { t: "12:00", label: "Noon" },
-    { t: "18:00", label: "Evening" },
-    { t: "21:00", label: "Bedtime" },
+    { t: "08:00", key: "q_morning" },
+    { t: "12:00", key: "q_noon" },
+    { t: "18:00", key: "q_evening" },
+    { t: "21:00", key: "q_bedtime" },
   ];
+  // Words: English, German, Spanish and French. The board follows the language
+  // in the viewer's Home Assistant profile; anything missing falls back to English.
+  const STRINGS = {
+    en: {
+      bg_aurora: "Aurora", bg_black: "Black", bg_sunset: "Sunset", bg_ocean: "Ocean", bg_forest: "Forest", bg_lavender: "Lavender",
+      bg_ember: "Ember", bg_graphite: "Graphite", bg_midnight: "Midnight", bg_halloween: "Halloween", bg_festive: "Festive", tint_clear: "clear",
+      tint_rose: "rose", tint_amber: "amber", tint_mint: "mint", tint_sky: "sky", tint_violet: "violet", cf_title: "Title", cf_height: "Height (CSS, e.g. 100vh or 720px)",
+      cf_ambient: "Ambient mode after (0 = off)", cf_bgimg: "Background image URL (optional)", cf_clock: "Show clock", phone_app: "{name} (phone app)",
+      home: "Home", bg_colours: "Background colours", people: "People", wake: "Tap anywhere to wake", almost: "Almost there", nothing_here: "Nothing here",
+      add_people: "Add people", close: "Close", colour: "Colour", cancel: "Cancel", delete: "Delete", tap_delete: "Tap again to delete",
+      edit: "Edit", default: "Default", own_colours: "Your own colours", colour_n: "Colour {n}", look_hint_html: "Changing a colour previews it right away. Select <b>Use my colours</b> to keep it.",
+      in_use: "In use", use_mine: "Use my colours", edit_person: "Edit person", add_a_person: "Add a person", name_ph: "Name, for example Maya",
+      picture: "Picture", picture_e: "Picture {e}", optional: "(optional)", dont_notify: "Don't notify", install_app: "Install the Home Assistant app on a phone to enable notifications.",
+      save_changes: "Save changes", add_person: "Add person", notifies: "Notifies {x}", no_notifications: "No notifications", tap_remove: "Tap again to remove",
+      remove: "Remove", no_one: "No one yet. Add the first person above.", ha_users: "Home Assistant users", show_ha: "Show Home Assistant users",
+      ha_off: "Hidden. Turn on to also show people from Home Assistant.", from_ha: "From Home Assistant", type_name_err: "Please type a name.",
+      cf_column: "Tile width", cf_group: "Group tiles: to do first, done last", default_title: "Tasks", stub_title: "Household tasks",
+      new_task: "New task", all: "All", todo: "To do", done: "Done", coming_up: "Coming up", day_today: "today", day_tomorrow: "tomorrow",
+      day_yesterday: "yesterday", sch_by: "{label} by {times}", every_day: "Every day", weekdays: "Weekdays", weekends: "Weekends",
+      every_list: "Every {days}", every_n: "Every {n} days", twice: "Twice a day", n_times: "{n} times a day", st_done: "Done",
+      st_overdue: "Overdue · was due {when}", st_due_by: "Due by {time}", st_due_today: "Due today", st_any_time: "Any time today",
+      st_next: "Next: {when}", st_not_today: "Not due today", next_by: "next by {time}", stat_done: "done", stat_due: "due", stat_overdue: "overdue",
+      stat_upcoming: "upcoming", everyone: "Everyone", job: "{name}'s job", everyones_job: "Everyone's job", someone: "Someone",
+      dots: "{n} of {m} done today", details_for: "Details for {title}", setup_html: "Add the <b>Glass Task Board</b> integration in <b>Settings → Devices &amp; services → Add integration</b>, then reload this page.",
+      cant_load: "Couldn't load tasks", welcome: "Welcome to your task board", all_done: "All done for now", fresh_lead: "Add the jobs your home repeats: feeding the pets, pills, bins night. Tap a tile when it's done and it resets on its own.",
+      all_done_lead: "Nothing is due right now. Nice work.", no_match: "No tasks match this filter.", add_first: "Add your first task",
+      nothing_due: "Nothing is due right now.", who_did: "Who did it?", history_settings: "History & settings", no_reminders: "No reminders",
+      not_done_yet: "Not done yet.", mark_done: "Mark done", mark_again: "Mark done again", undo_last: "Undo last", edit_task: "Edit task",
+      step_what: "What needs doing?", title_ph: "For example: Feed the dog", icon: "Icon", icon_e: "Icon {e}", step_often: "How often?",
+      rep_daily: "Every day", rep_weekly: "Certain days", rep_every: "Every few days", fewer_days: "Fewer days", more_days: "More days",
+      counted: "Counted from the last time it was done.", n_times_hint: "{n} times a day — once for each time below.", once_hint: "Once a day. Add a second time below for twice a day.",
+      step_by: "Done by", any_time: "Any time that day.", remove_x: "Remove {x}", another_time: "Another time", add_time: "Add time",
+      step_whose: "Whose job?", people_hint_html: "Add people with the <b>People</b> button to give someone a task.", more_opts: "More options: colour, reminders",
+      remind_label: "Remind on phones when it's overdue", remind_aria: "Remind when overdue", save: "Save", add_task: "Add task",
+      err_name: "Give the task a name.", err_day: "Pick at least one day.", q_morning: "Morning", q_noon: "Noon", q_evening: "Evening",
+      q_bedtime: "Bedtime", pr_dog: "Feed the dog", pr_cat: "Feed the cat", pr_pills: "Morning pills", pr_bins: "Take out the bins",
+      pr_plants: "Water the plants", pr_dishwasher: "Empty the dishwasher", pr_teeth: "Brush teeth", pr_bed: "Make the bed", background: "Background",
+      look_lead: "Pick a colour theme for the board. It changes on every screen showing this board.", people_lead: "Add everyone who helps out. Tap their face to say who did a task, or give them tasks of their own.",
+      notify_label: "Remind them on their phone when their task is overdue", on_board: "On the board", ha_on: "These people from Home Assistant are also on the board.",
+    },
+    de: {
+      bg_aurora: "Polarlicht", bg_black: "Schwarz", bg_sunset: "Sonnenuntergang", bg_ocean: "Ozean", bg_forest: "Wald", bg_lavender: "Lavendel",
+      bg_ember: "Glut", bg_graphite: "Graphit", bg_midnight: "Mitternacht", bg_halloween: "Halloween", bg_festive: "Festlich",
+      tint_clear: "klar", tint_rose: "rosa", tint_amber: "bernstein", tint_mint: "mint", tint_sky: "himmelblau", tint_violet: "violett",
+      cf_title: "Titel", cf_height: "Höhe (CSS, z. B. 100vh oder 720px)", cf_ambient: "Ruhemodus nach (0 = aus)", cf_bgimg: "Adresse des Hintergrundbilds (optional)",
+      cf_clock: "Uhr anzeigen", phone_app: "{name} (Handy-App)", home: "Zuhause", bg_colours: "Hintergrundfarben", people: "Personen",
+      wake: "Zum Aufwecken irgendwo tippen", almost: "Fast geschafft", nothing_here: "Hier ist nichts", add_people: "Personen hinzufügen",
+      close: "Schließen", colour: "Farbe", cancel: "Abbrechen", delete: "Löschen", tap_delete: "Zum Löschen erneut tippen", edit: "Bearbeiten",
+      default: "Standard", own_colours: "Eigene Farben", colour_n: "Farbe {n}", look_hint_html: "Wenn du eine Farbe änderst, siehst du sie sofort. Wähle <b>Meine Farben verwenden</b>, um sie zu behalten.",
+      in_use: "Aktiv", use_mine: "Meine Farben verwenden", edit_person: "Person bearbeiten", add_a_person: "Person hinzufügen",
+      name_ph: "Name, zum Beispiel Maya", picture: "Bild", picture_e: "Bild {e}", optional: "(optional)", dont_notify: "Nicht benachrichtigen",
+      install_app: "Installiere die Home Assistant App auf einem Handy, um Benachrichtigungen zu aktivieren.", save_changes: "Änderungen speichern",
+      add_person: "Person hinzufügen", notifies: "Benachrichtigt {x}", no_notifications: "Keine Benachrichtigungen", tap_remove: "Zum Entfernen erneut tippen",
+      remove: "Entfernen", no_one: "Noch niemand. Füge oben die erste Person hinzu.", ha_users: "Home Assistant Benutzer", show_ha: "Home Assistant Benutzer anzeigen",
+      ha_off: "Ausgeblendet. Einschalten, um auch Personen aus Home Assistant zu zeigen.", from_ha: "Aus Home Assistant", type_name_err: "Bitte gib einen Namen ein.",
+      cf_column: "Kachelbreite", cf_group: "Kacheln gruppieren: Offenes zuerst, Erledigtes zuletzt", default_title: "Aufgaben",
+      stub_title: "Haushaltsaufgaben", new_task: "Neue Aufgabe", all: "Alle", todo: "Zu erledigen", done: "Erledigt", coming_up: "Demnächst",
+      day_today: "heute", day_tomorrow: "morgen", day_yesterday: "gestern", sch_by: "{label} bis {times}", every_day: "Jeden Tag",
+      weekdays: "Werktags", weekends: "Am Wochenende", every_list: "Jeden {days}", every_n: "Alle {n} Tage", twice: "Zweimal täglich",
+      n_times: "{n}-mal täglich", st_done: "Erledigt", st_overdue: "Überfällig seit {when}", st_due_by: "Fällig bis {time}", st_due_today: "Heute fällig",
+      st_any_time: "Irgendwann heute", st_next: "Nächstes Mal: {when}", st_not_today: "Heute nicht fällig", next_by: "nächstes Mal bis {time}",
+      stat_done: "erledigt", stat_due: "fällig", stat_overdue: "überfällig", stat_upcoming: "demnächst", everyone: "Alle", job: "Aufgabe von {name}",
+      everyones_job: "Aufgabe für alle", someone: "Jemand", dots: "{n} von {m} heute erledigt", details_for: "Details zu {title}",
+      setup_html: "Füge die Integration <b>Glass Task Board</b> unter <b>Einstellungen → Geräte &amp; Dienste → Integration hinzufügen</b> hinzu und lade dann diese Seite neu.",
+      cant_load: "Aufgaben konnten nicht geladen werden", welcome: "Willkommen bei deiner Aufgabentafel", all_done: "Fürs Erste alles erledigt",
+      fresh_lead: "Füge die Aufgaben hinzu, die sich bei dir wiederholen: Haustiere füttern, Tabletten, Mülltonnen rausstellen. Tippe auf eine Kachel, wenn sie erledigt ist – sie setzt sich von selbst zurück.",
+      all_done_lead: "Gerade ist nichts fällig. Gut gemacht.", no_match: "Keine Aufgaben passen zu diesem Filter.", add_first: "Erste Aufgabe hinzufügen",
+      nothing_due: "Gerade ist nichts fällig.", who_did: "Wer hat es gemacht?", history_settings: "Verlauf & Einstellungen", no_reminders: "Keine Erinnerungen",
+      not_done_yet: "Noch nicht erledigt.", mark_done: "Als erledigt markieren", mark_again: "Noch einmal erledigt", undo_last: "Letztes rückgängig",
+      edit_task: "Aufgabe bearbeiten", step_what: "Was ist zu tun?", title_ph: "Zum Beispiel: Hund füttern", icon: "Symbol", icon_e: "Symbol {e}",
+      step_often: "Wie oft?", rep_daily: "Jeden Tag", rep_weekly: "Bestimmte Tage", rep_every: "Alle paar Tage", fewer_days: "Weniger Tage",
+      more_days: "Mehr Tage", counted: "Gezählt ab dem letzten Mal, als sie erledigt wurde.", n_times_hint: "{n}-mal täglich – einmal für jede Uhrzeit unten.",
+      once_hint: "Einmal am Tag. Füge unten eine zweite Uhrzeit für zweimal täglich hinzu.", step_by: "Erledigt bis", any_time: "Irgendwann an dem Tag.",
+      remove_x: "{x} entfernen", another_time: "Weitere Uhrzeit", add_time: "Uhrzeit hinzufügen", step_whose: "Wessen Aufgabe?",
+      people_hint_html: "Füge mit der Schaltfläche <b>Personen</b> Leute hinzu, um jemandem eine Aufgabe zu geben.", more_opts: "Weitere Optionen: Farbe, Erinnerungen",
+      remind_label: "Auf Handys erinnern, wenn sie überfällig ist", remind_aria: "Erinnern, wenn überfällig", save: "Speichern",
+      add_task: "Aufgabe hinzufügen", err_name: "Gib der Aufgabe einen Namen.", err_day: "Wähle mindestens einen Tag.", q_morning: "Morgens",
+      q_noon: "Mittags", q_evening: "Abends", q_bedtime: "Schlafenszeit", pr_dog: "Hund füttern", pr_cat: "Katze füttern", pr_pills: "Morgentabletten",
+      pr_bins: "Mülltonnen rausstellen", pr_plants: "Pflanzen gießen", pr_dishwasher: "Spülmaschine ausräumen", pr_teeth: "Zähne putzen",
+      pr_bed: "Bett machen", background: "Hintergrund", look_lead: "Wähle ein Farbthema für die Tafel. Es ändert sich auf jedem Bildschirm, der diese Tafel zeigt.",
+      people_lead: "Füge alle hinzu, die mithelfen. Tippe auf ihr Gesicht, um zu sagen, wer eine Aufgabe erledigt hat, oder gib ihnen eigene Aufgaben.",
+      notify_label: "Auf dem Handy erinnern, wenn ihre Aufgabe überfällig ist", on_board: "Auf der Tafel", ha_on: "Diese Personen aus Home Assistant sind auch auf der Tafel.",
+    },
+    es: {
+      bg_aurora: "Aurora", bg_black: "Negro", bg_sunset: "Atardecer", bg_ocean: "Océano", bg_forest: "Bosque", bg_lavender: "Lavanda",
+      bg_ember: "Brasa", bg_graphite: "Grafito", bg_midnight: "Medianoche", bg_halloween: "Halloween", bg_festive: "Festivo", tint_clear: "transparente",
+      tint_rose: "rosa", tint_amber: "ámbar", tint_mint: "menta", tint_sky: "cielo", tint_violet: "violeta", cf_title: "Título",
+      cf_height: "Altura (CSS, p. ej. 100vh o 720px)", cf_ambient: "Modo reposo tras (0 = nunca)", cf_bgimg: "Dirección de la imagen de fondo (opcional)",
+      cf_clock: "Mostrar reloj", phone_app: "{name} (app del móvil)", home: "Casa", bg_colours: "Colores de fondo", people: "Personas",
+      wake: "Toca en cualquier lugar para activar", almost: "Ya casi está", nothing_here: "No hay nada aquí", add_people: "Añadir personas",
+      close: "Cerrar", colour: "Color", cancel: "Cancelar", delete: "Borrar", tap_delete: "Toca de nuevo para borrar", edit: "Editar",
+      default: "Predeterminado", own_colours: "Tus propios colores", colour_n: "Color {n}", look_hint_html: "Al cambiar un color lo ves al momento. Selecciona <b>Usar mis colores</b> para mantenerlo.",
+      in_use: "En uso", use_mine: "Usar mis colores", edit_person: "Editar persona", add_a_person: "Añadir una persona", name_ph: "Nombre, por ejemplo Maya",
+      picture: "Imagen", picture_e: "Imagen {e}", optional: "(opcional)", dont_notify: "No avisar", install_app: "Instala la app de Home Assistant en un móvil para activar las notificaciones.",
+      save_changes: "Guardar cambios", add_person: "Añadir persona", notifies: "Avisa a {x}", no_notifications: "Sin notificaciones",
+      tap_remove: "Toca de nuevo para quitar", remove: "Quitar", no_one: "Aún no hay nadie. Añade arriba a la primera persona.",
+      ha_users: "Usuarios de Home Assistant", show_ha: "Mostrar usuarios de Home Assistant", ha_off: "Ocultas. Actívalo para mostrar también a las personas de Home Assistant.",
+      from_ha: "De Home Assistant", type_name_err: "Escribe un nombre.", cf_column: "Ancho de las fichas", cf_group: "Agrupar fichas: pendientes primero, hechas al final",
+      default_title: "Tareas", stub_title: "Tareas de casa", new_task: "Nueva tarea", all: "Todas", todo: "Pendientes", done: "Hechas",
+      coming_up: "Próximamente", day_today: "hoy", day_tomorrow: "mañana", day_yesterday: "ayer", sch_by: "{label} antes de {times}",
+      every_day: "Todos los días", weekdays: "Entre semana", weekends: "Fines de semana", every_list: "Cada {days}", every_n: "Cada {n} días",
+      twice: "Dos veces al día", n_times: "{n} veces al día", st_done: "Hecha", st_overdue: "Atrasada desde {when}", st_due_by: "Antes de {time}",
+      st_due_today: "Toca hoy", st_any_time: "Cuando sea hoy", st_next: "Próxima: {when}", st_not_today: "Hoy no toca", next_by: "la próxima antes de {time}",
+      stat_done: "hecha", stat_due: "pendiente", stat_overdue: "atrasada", stat_upcoming: "próxima", everyone: "Todos", job: "Tarea de {name}",
+      everyones_job: "Tarea de todos", someone: "Alguien", dots: "{n} de {m} hechas hoy", details_for: "Detalles de {title}", setup_html: "Añade la integración <b>Glass Task Board</b> en <b>Ajustes → Dispositivos y servicios → Añadir integración</b> y vuelve a cargar esta página.",
+      cant_load: "No se pudieron cargar las tareas", welcome: "Te damos la bienvenida a tu tablero de tareas", all_done: "Todo hecho por ahora",
+      fresh_lead: "Añade las tareas que se repiten en casa: dar de comer a las mascotas, las pastillas, sacar la basura. Toca una ficha cuando esté hecha y se reinicia sola.",
+      all_done_lead: "Ahora no toca nada. ¡Buen trabajo!", no_match: "Ninguna tarea coincide con este filtro.", add_first: "Añade tu primera tarea",
+      nothing_due: "Ahora no toca nada.", who_did: "¿Quién lo hizo?", history_settings: "Historial y ajustes", no_reminders: "Sin recordatorios",
+      not_done_yet: "Aún no se ha hecho.", mark_done: "Marcar como hecha", mark_again: "Marcar como hecha otra vez", undo_last: "Deshacer la última",
+      edit_task: "Editar tarea", step_what: "¿Qué hay que hacer?", title_ph: "Por ejemplo: Dar de comer al perro", icon: "Icono",
+      icon_e: "Icono {e}", step_often: "¿Cada cuánto?", rep_daily: "Todos los días", rep_weekly: "Ciertos días", rep_every: "Cada pocos días",
+      fewer_days: "Menos días", more_days: "Más días", counted: "Se cuenta desde la última vez que se hizo.", n_times_hint: "{n} veces al día: una por cada hora de abajo.",
+      once_hint: "Una vez al día. Añade una segunda hora abajo para dos veces al día.", step_by: "Hecha antes de", any_time: "Cuando sea ese día.",
+      remove_x: "Quitar {x}", another_time: "Otra hora", add_time: "Añadir hora", step_whose: "¿De quién es la tarea?", people_hint_html: "Añade personas con el botón <b>Personas</b> para darle una tarea a alguien.",
+      more_opts: "Más opciones: color, recordatorios", remind_label: "Avisar en los móviles cuando esté atrasada", remind_aria: "Avisar cuando esté atrasada",
+      save: "Guardar", add_task: "Añadir tarea", err_name: "Ponle un nombre a la tarea.", err_day: "Elige al menos un día.", q_morning: "Mañana",
+      q_noon: "Mediodía", q_evening: "Tarde", q_bedtime: "Hora de dormir", pr_dog: "Dar de comer al perro", pr_cat: "Dar de comer al gato",
+      pr_pills: "Pastillas de la mañana", pr_bins: "Sacar la basura", pr_plants: "Regar las plantas", pr_dishwasher: "Vaciar el lavavajillas",
+      pr_teeth: "Lavarse los dientes", pr_bed: "Hacer la cama", background: "Fondo", look_lead: "Elige un tema de color para el tablero. Cambia en todas las pantallas que muestran este tablero.",
+      people_lead: "Añade a todas las personas que ayudan. Toca su cara para decir quién hizo una tarea o dales tareas propias.",
+      notify_label: "Avisar en su móvil cuando su tarea esté atrasada", on_board: "En el tablero", ha_on: "Estas personas de Home Assistant también están en el tablero.",
+    },
+    fr: {
+      bg_aurora: "Aurore", bg_black: "Noir", bg_sunset: "Coucher de soleil", bg_ocean: "Océan", bg_forest: "Forêt", bg_lavender: "Lavande",
+      bg_ember: "Braise", bg_graphite: "Graphite", bg_midnight: "Minuit", bg_halloween: "Halloween", bg_festive: "Festif", tint_clear: "transparent",
+      tint_rose: "rose", tint_amber: "ambre", tint_mint: "menthe", tint_sky: "ciel", tint_violet: "violet", cf_title: "Titre",
+      cf_height: "Hauteur (CSS, par ex. 100vh ou 720px)", cf_ambient: "Mode veille après (0 = jamais)", cf_bgimg: "Adresse de l'image de fond (facultatif)",
+      cf_clock: "Afficher l'horloge", phone_app: "{name} (appli mobile)", home: "Maison", bg_colours: "Couleurs de fond", people: "Personnes",
+      wake: "Touchez n'importe où pour réveiller", almost: "Presque terminé", nothing_here: "Rien ici", add_people: "Ajouter des personnes",
+      close: "Fermer", colour: "Couleur", cancel: "Annuler", delete: "Supprimer", tap_delete: "Touchez à nouveau pour supprimer",
+      edit: "Modifier", default: "Par défaut", own_colours: "Vos propres couleurs", colour_n: "Couleur {n}", look_hint_html: "Changer une couleur l'affiche aussitôt. Sélectionnez <b>Utiliser mes couleurs</b> pour la garder.",
+      in_use: "Utilisé", use_mine: "Utiliser mes couleurs", edit_person: "Modifier la personne", add_a_person: "Ajouter une personne",
+      name_ph: "Nom, par exemple Maya", picture: "Image", picture_e: "Image {e}", optional: "(facultatif)", dont_notify: "Ne pas notifier",
+      install_app: "Installez l'application Home Assistant sur un téléphone pour activer les notifications.", save_changes: "Enregistrer",
+      add_person: "Ajouter la personne", notifies: "Notifie {x}", no_notifications: "Aucune notification", tap_remove: "Touchez à nouveau pour retirer",
+      remove: "Retirer", no_one: "Personne pour l'instant. Ajoutez la première personne ci-dessus.", ha_users: "Utilisateurs de Home Assistant",
+      show_ha: "Afficher les utilisateurs de Home Assistant", ha_off: "Masquées. Activez pour afficher aussi les personnes de Home Assistant.",
+      from_ha: "Depuis Home Assistant", type_name_err: "Veuillez saisir un nom.", cf_column: "Largeur des tuiles", cf_group: "Grouper les tuiles : à faire d'abord, faites à la fin",
+      default_title: "Tâches", stub_title: "Tâches de la maison", new_task: "Nouvelle tâche", all: "Toutes", todo: "À faire", done: "Faites",
+      coming_up: "À venir", day_today: "aujourd'hui", day_tomorrow: "demain", day_yesterday: "hier", sch_by: "{label} avant {times}",
+      every_day: "Tous les jours", weekdays: "En semaine", weekends: "Le week-end", every_list: "Chaque {days}", every_n: "Tous les {n} jours",
+      twice: "Deux fois par jour", n_times: "{n} fois par jour", st_done: "Fait", st_overdue: "En retard depuis {when}", st_due_by: "Avant {time}",
+      st_due_today: "À faire aujourd'hui", st_any_time: "N'importe quand aujourd'hui", st_next: "Prochaine : {when}", st_not_today: "Rien aujourd'hui",
+      next_by: "prochaine avant {time}", stat_done: "faite", stat_due: "à faire", stat_overdue: "en retard", stat_upcoming: "à venir",
+      everyone: "Tout le monde", job: "Tâche de {name}", everyones_job: "Tâche de tout le monde", someone: "Quelqu'un", dots: "{n} sur {m} faites aujourd'hui",
+      details_for: "Détails de {title}", setup_html: "Ajoutez l'intégration <b>Glass Task Board</b> dans <b>Paramètres → Appareils et services → Ajouter une intégration</b>, puis rechargez cette page.",
+      cant_load: "Impossible de charger les tâches", welcome: "Bienvenue sur votre tableau des tâches", all_done: "Tout est fait pour l'instant",
+      fresh_lead: "Ajoutez les tâches qui reviennent à la maison : nourrir les animaux, les médicaments, sortir les poubelles. Touchez une tuile quand c'est fait : elle se réinitialise toute seule.",
+      all_done_lead: "Rien à faire pour le moment. Bravo !", no_match: "Aucune tâche ne correspond à ce filtre.", add_first: "Ajouter votre première tâche",
+      nothing_due: "Rien à faire pour le moment.", who_did: "Qui l'a fait ?", history_settings: "Historique et réglages", no_reminders: "Pas de rappels",
+      not_done_yet: "Pas encore fait.", mark_done: "Marquer comme fait", mark_again: "Marquer à nouveau comme fait", undo_last: "Annuler le dernier",
+      edit_task: "Modifier la tâche", step_what: "Que faut-il faire ?", title_ph: "Par exemple : Nourrir le chien", icon: "Icône",
+      icon_e: "Icône {e}", step_often: "À quelle fréquence ?", rep_daily: "Tous les jours", rep_weekly: "Certains jours", rep_every: "Tous les quelques jours",
+      fewer_days: "Moins de jours", more_days: "Plus de jours", counted: "Compté depuis la dernière fois que c'était fait.", n_times_hint: "{n} fois par jour : une fois pour chaque heure ci-dessous.",
+      once_hint: "Une fois par jour. Ajoutez une deuxième heure ci-dessous pour deux fois par jour.", step_by: "Fait avant", any_time: "N'importe quand ce jour-là.",
+      remove_x: "Retirer {x}", another_time: "Autre heure", add_time: "Ajouter l'heure", step_whose: "Qui s'en charge ?", people_hint_html: "Ajoutez des personnes avec le bouton <b>Personnes</b> pour confier une tâche à quelqu'un.",
+      more_opts: "Plus d'options : couleur, rappels", remind_label: "Rappeler sur les téléphones quand c'est en retard", remind_aria: "Rappeler en cas de retard",
+      save: "Enregistrer", add_task: "Ajouter la tâche", err_name: "Donnez un nom à la tâche.", err_day: "Choisissez au moins un jour.",
+      q_morning: "Matin", q_noon: "Midi", q_evening: "Soir", q_bedtime: "Coucher", pr_dog: "Nourrir le chien", pr_cat: "Nourrir le chat",
+      pr_pills: "Médicaments du matin", pr_bins: "Sortir les poubelles", pr_plants: "Arroser les plantes", pr_dishwasher: "Vider le lave-vaisselle",
+      pr_teeth: "Se brosser les dents", pr_bed: "Faire le lit", background: "Fond", look_lead: "Choisissez un thème de couleur pour le tableau. Il change sur chaque écran qui affiche ce tableau.",
+      people_lead: "Ajoutez toutes les personnes qui participent. Touchez leur visage pour dire qui a fait une tâche, ou confiez-leur leurs propres tâches.",
+      notify_label: "Rappel sur son téléphone quand sa tâche est en retard", on_board: "Sur le tableau", ha_on: "Ces personnes de Home Assistant sont aussi sur le tableau.",
+    },
+  };
+  const langOf = (hass) =>
+    String((hass && ((hass.locale && hass.locale.language) || hass.language)) || navigator.language || "en").slice(0, 2).toLowerCase();
+  const pageLang = () => langOf(document.querySelector("home-assistant") && document.querySelector("home-assistant").hass);
+  const tr = (lang, key, vars) => {
+    const table = STRINGS[lang] || STRINGS.en;
+    let s = table[key] ?? STRINGS.en[key] ?? key;
+    if (vars) for (const [k, v] of Object.entries(vars)) s = s.split(`{${k}}`).join(v);
+    return s;
+  };
 
   // Background themes: base colour plus three glow colours. Aurora is the default.
   const BACKGROUNDS = {
-    aurora: { name: "Aurora", base: "#070b1c", colors: ["#5b6cff", "#ff5fa2", "#22d3c5"] },
-    black: { name: "Black", base: "#000000", colors: ["#2c2c30", "#1f1f24", "#3a3a40"] },
-    sunset: { name: "Sunset", base: "#1a0a10", colors: ["#ff7a45", "#ff3d77", "#ffc15e"] },
-    ocean: { name: "Ocean", base: "#021321", colors: ["#1e88e5", "#00bcd4", "#5c6bc0"] },
-    forest: { name: "Forest", base: "#06130c", colors: ["#43a047", "#9ccc65", "#00897b"] },
-    lavender: { name: "Lavender", base: "#110c1d", colors: ["#9575cd", "#f48fb1", "#7986cb"] },
-    ember: { name: "Ember", base: "#150806", colors: ["#ff5722", "#ffa000", "#d81b60"] },
-    graphite: { name: "Graphite", base: "#0b0d10", colors: ["#78909c", "#b0bec5", "#455a64"] },
-    midnight: { name: "Midnight", base: "#04050b", colors: ["#283593", "#1565c0", "#4a148c"] },
-    halloween: { name: "Halloween", base: "#0c0610", colors: ["#ff6d00", "#8e24aa", "#43a047"] },
-    festive: { name: "Festive", base: "#0a1210", colors: ["#e53935", "#43a047", "#fdd835"] },
+    aurora: { base: "#070b1c", colors: ["#5b6cff", "#ff5fa2", "#22d3c5"] },
+    black: { base: "#000000", colors: ["#2c2c30", "#1f1f24", "#3a3a40"] },
+    sunset: { base: "#1a0a10", colors: ["#ff7a45", "#ff3d77", "#ffc15e"] },
+    ocean: { base: "#021321", colors: ["#1e88e5", "#00bcd4", "#5c6bc0"] },
+    forest: { base: "#06130c", colors: ["#43a047", "#9ccc65", "#00897b"] },
+    lavender: { base: "#110c1d", colors: ["#9575cd", "#f48fb1", "#7986cb"] },
+    ember: { base: "#150806", colors: ["#ff5722", "#ffa000", "#d81b60"] },
+    graphite: { base: "#0b0d10", colors: ["#78909c", "#b0bec5", "#455a64"] },
+    midnight: { base: "#04050b", colors: ["#283593", "#1565c0", "#4a148c"] },
+    halloween: { base: "#0c0610", colors: ["#ff6d00", "#8e24aa", "#43a047"] },
+    festive: { base: "#0a1210", colors: ["#e53935", "#43a047", "#fdd835"] },
   };
   const DEFAULT_BACKGROUND = "aurora";
   const darkBase = (hex) => {
@@ -152,6 +327,7 @@
   .chip { display:inline-flex; align-items:center; gap:8px; padding: 7px 14px 7px 8px; border-radius: 999px; font-size: 14px; min-height:40px;
     background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); transition: background .2s, border-color .2s, transform .15s; }
   .chip.text { padding: 7px 16px; }
+  .filters .chip.text { flex-shrink: 0; }
   .chip:active { transform: scale(.96); }
   .chip.on { background: rgba(255,255,255,.26); border-color: rgba(255,255,255,.55); box-shadow: inset 0 1px 0 rgba(255,255,255,.4); }
   .chip .n { font-size: 11px; background: rgba(255,255,255,.22); border-radius: 999px; padding: 1px 7px; }
@@ -180,6 +356,7 @@
   @keyframes fade { from { opacity:0; } }
   .sheet { width: min(760px, 100%); max-height: 100%; overflow:auto; padding: 22px 26px 24px; animation: pop .35s cubic-bezier(.2,.9,.25,1.1) both; scrollbar-width:none; }
   @keyframes pop { from { opacity:0; transform: translateY(24px) scale(.97); } }
+  .settled { animation: none !important; }
   .sheet-head { display:flex; align-items:center; justify-content:space-between; margin-bottom: 14px; }
   .sheet-head h2 { margin:0; font-weight:500; font-size: 24px; }
   .icon-btn { width:44px; height:44px; border-radius:50%; display:grid; place-items:center; font-size:22px; background: rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16); }
@@ -407,8 +584,8 @@
       this._justDone = new Set();
     }
 
-    static getStubConfig() {
-      return { title: "Household tasks" };
+    static getStubConfig(hass) {
+      return { title: tr(langOf(hass || (document.querySelector("home-assistant") || {}).hass), "stub_title") };
     }
 
     static getConfigForm() {
@@ -422,22 +599,16 @@
           { name: "show_clock", selector: { boolean: {} } },
           { name: "group_by_status", selector: { boolean: {} } },
         ],
-        computeLabel: (s) =>
-          ({
-            title: "Title",
-            height: "Height (CSS, e.g. 100vh or 720px)",
-            ambient_after: "Ambient mode after (0 = off)",
-            column_width: "Tile width",
-            background_image: "Background image URL (optional)",
-            show_clock: "Show clock",
-            group_by_status: "Group tiles: to do first, done last",
-          })[s.name],
+        computeLabel: (s) => {
+          const key = { title: "cf_title", height: "cf_height", ambient_after: "cf_ambient", column_width: "cf_column", background_image: "cf_bgimg", show_clock: "cf_clock", group_by_status: "cf_group" }[s.name];
+          return key ? tr(pageLang(), key) : undefined;
+        },
       };
     }
 
     setConfig(config) {
+      this._titleDefault = !config || config.title === undefined;
       this._config = {
-        title: "Tasks",
         height: "calc(100vh - var(--header-height, 56px) - 16px)",
         ambient_after: 120,
         column_width: 260,
@@ -452,10 +623,20 @@
       }
     }
 
+    _t(key, vars) {
+      return tr(langOf(this._hass), key, vars);
+    }
+
     set hass(hass) {
       const first = !this._hass;
       this._hass = hass;
       if (!this._built) this._build();
+      const lang = langOf(hass);
+      if (this._langCode !== lang) {
+        const changed = this._langCode !== undefined;
+        this._langCode = lang;
+        if (changed) this._relabel();
+      }
       const sig = this._people()
         .map((p) => p.id + p.name + p.pic)
         .join("|");
@@ -582,7 +763,7 @@
       const pretty = (s) => {
         const mobile = s.startsWith("mobile_app_");
         const base = (mobile ? s.slice(11) : s).replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-        return mobile ? `${base} (phone app)` : base;
+        return mobile ? this._t("phone_app", { name: base }) : base;
       };
       return svcs
         .sort((a, b) => (b.startsWith("mobile_app_") - a.startsWith("mobile_app_")) || a.localeCompare(b))
@@ -602,7 +783,7 @@
     _person(id, fallbackName) {
       const p = id && [...this._people(), ...this._haPeople()].find((x) => x.id === id);
       if (p) return p;
-      return { id: id || "home", name: fallbackName || "Home", pic: "", home: !id };
+      return { id: id || "home", name: fallbackName || this._t("home"), pic: "", home: !id };
     }
 
     _visible() {
@@ -631,16 +812,16 @@
               <div class="clock"><div class="time"></div><div class="date"></div></div>
               <div class="title"></div>
               <nav class="filters"></nav>
-              <button class="ghost-btn icon-only" data-action="look" aria-label="Background colours" title="Background colours">${ICON.palette}</button>
-              <button class="ghost-btn people-btn" data-action="people" aria-label="People">${ICON.people}<span>People</span></button>
-              <button class="new" data-action="new-task">${ICON.plus}<span>New task</span></button>
+              <button class="ghost-btn icon-only" data-action="look" aria-label="${this._t("bg_colours")}" title="${this._t("bg_colours")}">${ICON.palette}</button>
+              <button class="ghost-btn people-btn" data-action="people" aria-label="${this._t("people")}">${ICON.people}<span>${this._t("people")}</span></button>
+              <button class="new" data-action="new-task">${ICON.plus}<span>${this._t("new_task")}</span></button>
             </header>
             <main><div class="board"></div></main>
           </div>
           <div class="ambient" data-action="wake">
             <div class="a-time"></div><div class="a-date"></div>
             <div class="a-spot glass"></div>
-            <div class="a-hint">Tap anywhere to wake</div>
+            <div class="a-hint">${this._t("wake")}</div>
           </div>
           <div class="scrim pick-scrim" hidden></div>
           <div class="scrim detail-scrim" hidden></div>
@@ -655,13 +836,35 @@
       this._applyConfig();
     }
 
+    // The language changed while the board was open: update the fixed labels.
+    _relabel() {
+      const q = (sel) => this.shadowRoot.querySelector(sel);
+      const look = q('header [data-action="look"]');
+      look.setAttribute("aria-label", this._t("bg_colours"));
+      look.setAttribute("title", this._t("bg_colours"));
+      q('header [data-action="people"]').setAttribute("aria-label", this._t("people"));
+      q('header [data-action="people"] span').textContent = this._t("people");
+      q('header [data-action="new-task"] span').textContent = this._t("new_task");
+      q(".a-hint").textContent = this._t("wake");
+      this._applyConfig();
+      this._renderFilters();
+      this._renderBoard();
+      if (this._ambient) this._renderSpot(true);
+      if (this._lookUi) this._renderLook();
+      if (this._editor) this._renderEditor();
+      if (this._pickId) this._renderPick();
+      if (this._openId) this._renderDetail();
+      if (this._peopleUi) this._renderPeople();
+    }
+
     _applyConfig() {
       const c = this._config || {};
       const root = this.shadowRoot.querySelector(".root");
       root.style.setProperty("--gm-height", c.height);
       root.style.setProperty("--gm-col", `${Number(c.column_width) || 260}px`);
-      this.shadowRoot.querySelector(".title").textContent = c.title || "";
-      this.shadowRoot.querySelector(".title").style.display = c.title ? "" : "none";
+      const title = this._titleDefault ? this._t("default_title") : c.title;
+      this.shadowRoot.querySelector(".title").textContent = title || "";
+      this.shadowRoot.querySelector(".title").style.display = title ? "" : "none";
       this.shadowRoot.querySelector(".clock").style.display = c.show_clock === false ? "none" : "";
       const bg = this.shadowRoot.querySelector(".bgimg");
       bg.style.backgroundImage = c.background_image ? `url("${String(c.background_image).replace(/["\\]/g, "")}")` : "";
@@ -681,8 +884,8 @@
       const all = this._sorted();
       const todo = all.filter((t) => t.status === "due" || t.status === "overdue").length;
       const late = all.some((t) => t.status === "overdue");
-      let html = `<button class="chip text ${this._filter === "all" ? "on" : ""}" data-action="filter" data-f="all">All <span class="n">${all.length}</span></button>`;
-      html += `<button class="chip text ${this._filter === "todo" ? "on" : ""} ${late ? "alert" : ""}" data-action="filter" data-f="todo">To do <span class="n">${todo}</span></button>`;
+      let html = `<button class="chip text ${this._filter === "all" ? "on" : ""}" data-action="filter" data-f="all">${this._t("all")} <span class="n">${all.length}</span></button>`;
+      html += `<button class="chip text ${this._filter === "todo" ? "on" : ""} ${late ? "alert" : ""}" data-action="filter" data-f="todo">${this._t("todo")} <span class="n">${todo}</span></button>`;
       for (const p of this._people()) {
         html += `<button class="chip ${this._filter === p.id ? "on" : ""}" data-action="filter" data-f="${esc(p.id)}" title="${esc(p.name)}">${this._avatar(p)}<span>${esc(p.name.split(" ")[0])}</span></button>`;
       }
@@ -692,6 +895,13 @@
     // ------------------------------------------------------------- time text
     _lang() {
       return (this._hass && this._hass.locale && this._hass.locale.language) || navigator.language;
+    }
+
+    _dayDiff(iso) {
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return NaN;
+      const startOf = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+      return Math.round((startOf(d) - startOf(new Date())) / 86400e3);
     }
 
     _clock(iso) {
@@ -710,18 +920,21 @@
     _day(iso) {
       const d = new Date(iso);
       if (Number.isNaN(d.getTime())) return "";
-      const startOf = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
-      const diff = Math.round((startOf(d) - startOf(new Date())) / 86400e3);
-      if (diff === 0) return "today";
-      if (diff === 1) return "tomorrow";
-      if (diff === -1) return "yesterday";
+      const diff = this._dayDiff(iso);
+      if (diff === 0) return this._t("day_today");
+      if (diff === 1) return this._t("day_tomorrow");
+      if (diff === -1) return this._t("day_yesterday");
       if (diff > 1 && diff < 7) return d.toLocaleDateString(this._lang(), { weekday: "long" });
       return d.toLocaleDateString(this._lang(), { month: "short", day: "numeric" });
     }
 
     _when(iso, withDay = true) {
-      const day = this._day(iso);
-      return withDay && day !== "today" ? `${day} ${this._clock(iso)}` : this._clock(iso);
+      return withDay && this._dayDiff(iso) !== 0 ? `${this._day(iso)} ${this._clock(iso)}` : this._clock(iso);
+    }
+
+    // When a task next comes back. Tasks without a due time only need the day.
+    _nextWhen(t) {
+      return (t.times || []).length ? this._when(t.next_due) : this._day(t.next_due);
     }
 
     _dayName(i, style = "short") {
@@ -731,69 +944,69 @@
 
     _scheduleText(t) {
       const times = (t.times || []).slice().sort();
-      const at = times.length ? ` by ${times.map((x) => this._hhmm(x)).join(" & ")}` : "";
+      const at = (label) => (times.length ? this._t("sch_by", { label, times: times.map((x) => this._hhmm(x)).join(" & ") }) : label);
       if (t.repeat === "weekly") {
         const days = (t.days || []).slice().sort();
         let label;
-        if (days.length === 7) label = "Every day";
-        else if (days.join() === "0,1,2,3,4") label = "Weekdays";
-        else if (days.join() === "5,6") label = "Weekends";
-        else label = `Every ${days.map((d) => this._dayName(d)).join(", ")}`;
-        return label + at;
+        if (days.length === 7) label = this._t("every_day");
+        else if (days.join() === "0,1,2,3,4") label = this._t("weekdays");
+        else if (days.join() === "5,6") label = this._t("weekends");
+        else label = this._t("every_list", { days: days.map((d) => this._dayName(d)).join(", ") });
+        return at(label);
       }
       if (t.repeat === "every") {
         const n = Number(t.every_days) || 1;
-        return (n > 1 ? `Every ${n} days` : "Every day") + at;
+        return at(n > 1 ? this._t("every_n", { n }) : this._t("every_day"));
       }
-      if (times.length === 2) return `Twice a day${at}`;
-      if (times.length > 2) return `${times.length} times a day${at}`;
-      return `Every day${at}`;
+      if (times.length === 2) return at(this._t("twice"));
+      if (times.length > 2) return at(this._t("n_times", { n: times.length }));
+      return at(this._t("every_day"));
     }
 
     _statusText(t) {
       switch (t.status) {
         case "done": {
           const who = t.done_by_name ? `<b>${esc(t.done_by_name)}</b> · ` : "";
-          return `Done · ${who}${esc(this._when(t.done_at))}`;
+          return `${esc(this._t("st_done"))} · ${who}${esc(this._when(t.done_at))}`;
         }
         case "overdue":
-          return t.due_at ? `Overdue · was due ${esc(this._when(t.due_at))}` : `Overdue · was due ${esc(this._day(t.period_start))}`;
+          return esc(this._t("st_overdue", { when: t.due_at ? this._when(t.due_at) : this._day(t.period_start) }));
         case "due":
-          if (t.due_at) return `Due by <b>${esc(this._clock(t.due_at))}</b>`;
-          return t.repeat === "every" ? "Due today" : "Any time today";
+          if (t.due_at) return this._t("st_due_by", { time: `<b>${esc(this._clock(t.due_at))}</b>` });
+          return esc(t.repeat === "every" ? this._t("st_due_today") : this._t("st_any_time"));
         default:
-          return t.next_due ? `Next: ${esc(this._when(t.next_due))}` : "Not due today";
+          return esc(t.next_due ? this._t("st_next", { when: this._nextWhen(t) }) : this._t("st_not_today"));
       }
     }
 
     _nextLine(t) {
       // For a done task that comes back later today, say when.
       if (t.status !== "done" || !t.next_due) return "";
-      return this._day(t.next_due) === "today" ? ` · next by ${esc(this._clock(t.next_due))}` : "";
+      return this._dayDiff(t.next_due) === 0 && (t.times || []).length ? ` · ${esc(this._t("next_by", { time: this._clock(t.next_due) }))}` : "";
     }
 
     // ------------------------------------------------------------- tiles
     _assigneeHTML(t) {
-      if (!t.assignee || t.assignee === "everyone") return `<span class="everyone-sm">🏡</span><span class="t-who">Everyone</span>`;
-      const p = this._person(t.assignee, "Someone");
-      return `${this._avatar(p)}<span class="t-who">${esc(p.name)}'s job</span>`;
+      if (!t.assignee || t.assignee === "everyone") return `<span class="everyone-sm">🏡</span><span class="t-who">${esc(this._t("everyone"))}</span>`;
+      const p = this._person(t.assignee, this._t("someone"));
+      return `${this._avatar(p)}<span class="t-who">${esc(this._t("job", { name: p.name }))}</span>`;
     }
 
     _taskHTML(t, opts = {}) {
       const tint = TINTS[t.tint] || TINTS.clear;
       const slots = Number(t.slots_today) || 0;
       const dots = slots > 1 && t.status !== "upcoming"
-        ? `<span class="t-dots" aria-label="${t.done_today} of ${slots} done today">${Array.from({ length: slots }, (_, i) => `<i class="${i < t.done_today ? "on" : ""}"></i>`).join("")}</span>`
+        ? `<span class="t-dots" aria-label="${esc(this._t("dots", { n: t.done_today, m: slots }))}">${Array.from({ length: slots }, (_, i) => `<i class="${i < t.done_today ? "on" : ""}"></i>`).join("")}</span>`
         : "";
       return `
         <div class="task glass st-${esc(t.status)} ${this._justDone.has(t.id) ? "just-done" : ""}" data-id="${esc(t.id)}" style="--tint:${tint}; ${opts.delay ? `animation-delay:${opts.delay}ms` : ""}">
-          <button class="t-main" data-action="t-tap" data-id="${esc(t.id)}" aria-label="${esc(t.title)}: ${esc(t.status)}">
+          <button class="t-main" data-action="t-tap" data-id="${esc(t.id)}" aria-label="${esc(t.title)}: ${esc(this._t(`stat_${t.status}`))}">
             <span class="t-icon">${esc(t.icon || "✅")}</span>
             <span class="t-body"><span class="t-title">${esc(t.title)}</span><span class="t-status">${this._statusText(t)}${this._nextLine(t)}</span></span>
             <span class="t-check">${t.status === "done" ? ICON.check : ""}</span>
           </button>
           <div class="t-foot">${this._assigneeHTML(t)}${dots}
-            <button class="t-more" data-action="t-open" data-id="${esc(t.id)}" aria-label="Details for ${esc(t.title)}">${ICON.dots}</button>
+            <button class="t-more" data-action="t-open" data-id="${esc(t.id)}" aria-label="${esc(this._t("details_for", { title: t.title }))}">${ICON.dots}</button>
           </div>
         </div>`;
     }
@@ -802,12 +1015,12 @@
       if (!this._built) return;
       const board = this.shadowRoot.querySelector(".board");
       if (this._problem === "setup") {
-        board.innerHTML = `<div class="problem glass"><div class="big">🧩</div><h2>Almost there</h2>
-          <p>Add the <b>Glass Task Board</b> integration in <b>Settings → Devices &amp; services → Add integration</b>, then reload this page.</p></div>`;
+        board.innerHTML = `<div class="problem glass"><div class="big">🧩</div><h2>${this._t("almost")}</h2>
+          <p>${this._t("setup_html")}</p></div>`;
         return;
       }
       if (this._problem) {
-        board.innerHTML = `<div class="problem glass"><h2>Couldn't load tasks</h2><p>${esc(this._problem)}</p></div>`;
+        board.innerHTML = `<div class="problem glass"><h2>${this._t("cant_load")}</h2><p>${esc(this._problem)}</p></div>`;
         return;
       }
       if (!this._loaded) {
@@ -820,10 +1033,10 @@
         const noPeople = !this._people().length;
         const allDone = this._filter === "todo" && this._tasks.size;
         board.innerHTML = `<div class="empty glass"><div class="big">${fresh ? "👋" : allDone ? "🎉" : "✨"}</div>
-          <h2>${fresh ? "Welcome to your task board" : allDone ? "All done for now" : "Nothing here"}</h2>
-          <p>${fresh ? "Add the jobs your home repeats: feeding the pets, pills, bins night. Tap a tile when it's done and it resets on its own." : allDone ? "Nothing is due right now. Nice work." : "No tasks match this filter."}</p>
-          ${fresh ? `<div class="cta">${noPeople ? `<button class="ghost-btn" data-action="people">${ICON.people}<span>Add people</span></button>` : ""}
-            <button class="new" data-action="new-task">${ICON.plus}<span>Add your first task</span></button></div>` : ""}</div>`;
+          <h2>${esc(this._t(fresh ? "welcome" : allDone ? "all_done" : "nothing_here"))}</h2>
+          <p>${esc(this._t(fresh ? "fresh_lead" : allDone ? "all_done_lead" : "no_match"))}</p>
+          ${fresh ? `<div class="cta">${noPeople ? `<button class="ghost-btn" data-action="people">${ICON.people}<span>${this._t("add_people")}</span></button>` : ""}
+            <button class="new" data-action="new-task">${ICON.plus}<span>${this._t("add_first")}</span></button></div>` : ""}</div>`;
         return;
       }
       const animate = !this._renderedOnce;
@@ -831,11 +1044,11 @@
       const tile = (t) => this._taskHTML(t, { delay: animate ? i++ * 50 : 0 });
       if (this._config && this._config.group_by_status) {
         const groups = [
-          ["To do", list.filter((t) => t.status === "overdue" || t.status === "due")],
-          ["Done", list.filter((t) => t.status === "done")],
-          ["Coming up", list.filter((t) => t.status === "upcoming")],
+          [this._t("todo"), list.filter((t) => t.status === "overdue" || t.status === "due")],
+          [this._t("done"), list.filter((t) => t.status === "done")],
+          [this._t("coming_up"), list.filter((t) => t.status === "upcoming")],
         ].filter(([, items]) => items.length);
-        board.innerHTML = groups.map(([name, items]) => `<div class="sec-title">${name}</div>${items.map(tile).join("")}`).join("");
+        board.innerHTML = groups.map(([name, items]) => `<div class="sec-title">${esc(name)}</div>${items.map(tile).join("")}`).join("");
       } else {
         board.innerHTML = list.map(tile).join("");
       }
@@ -967,15 +1180,16 @@
       if (!t) return this._closePick();
       const hint = this._suggestedDoer(t);
       const people = this._people().slice().sort((a, b) => (b.id === hint) - (a.id === hint));
+      const settled = scrim.querySelector(".sheet") ? " settled" : "";
       scrim.innerHTML = `
-        <div class="sheet glass" style="--tint:${TINTS[t.tint] || TINTS.clear}">
-          <div class="sheet-head"><h2>Who did it?</h2><button class="icon-btn" data-action="k-close" aria-label="Close">${ICON.close}</button></div>
+        <div class="sheet glass${settled}" style="--tint:${TINTS[t.tint] || TINTS.clear}">
+          <div class="sheet-head"><h2>${this._t("who_did")}</h2><button class="icon-btn" data-action="k-close" aria-label="${this._t("close")}">${ICON.close}</button></div>
           ${this._taskHead(t, this._statusText(t))}
           <div class="tiles big">
             ${people.map((p) => `<button class="tile ${p.id === hint ? "on" : ""}" data-action="k-who" data-id="${esc(p.id)}">${this._avatar(p)}<span>${esc(p.name)}</span></button>`).join("")}
-            <button class="tile" data-action="k-who" data-id=""><span class="everyone-av">🙂</span><span>Someone</span></button>
+            <button class="tile" data-action="k-who" data-id=""><span class="everyone-av">🙂</span><span>${esc(this._t("someone"))}</span></button>
           </div>
-          <div class="sheet-foot"><span class="err"></span><button class="ghost-btn" data-action="k-details">${ICON.clock}<span>History &amp; settings</span></button></div>
+          <div class="sheet-foot"><span class="err"></span><button class="ghost-btn" data-action="k-details">${ICON.clock}<span>${esc(this._t("history_settings"))}</span></button></div>
         </div>`;
     }
 
@@ -1023,29 +1237,30 @@
       const t = this._tasks.get(this._openId);
       const scrim = this.shadowRoot.querySelector(".detail-scrim");
       if (!t) return this._closeDetail();
-      const assignee = !t.assignee || t.assignee === "everyone" ? "Everyone's job" : `${this._person(t.assignee, "Someone").name}'s job`;
+      const assignee = !t.assignee || t.assignee === "everyone" ? this._t("everyones_job") : this._t("job", { name: this._person(t.assignee, this._t("someone")).name });
       const history = (t.history || [])
         .map((h) => {
-          const p = h.by ? this._person(h.by, h.by_name || "Someone") : { id: "someone", name: "Someone", emoji: "🙂", hue: 210 };
+          const p = h.by ? this._person(h.by, h.by_name || this._t("someone")) : { id: "someone", name: this._t("someone"), emoji: "🙂", hue: 210 };
           return `<li>${this._avatar(p)}<span>${esc(p.name)}</span><small>${esc(this._when(h.at))}</small></li>`;
         })
         .join("");
       const todo = t.status === "due" || t.status === "overdue";
+      const settled = scrim.querySelector(".detail") ? " settled" : "";
       scrim.innerHTML = `
-        <div class="detail glass" style="--tint:${t.status === "overdue" ? OVERDUE_TINT : t.status === "done" ? DONE_TINT : TINTS[t.tint] || TINTS.clear}">
+        <div class="detail glass${settled}" style="--tint:${t.status === "overdue" ? OVERDUE_TINT : t.status === "done" ? DONE_TINT : TINTS[t.tint] || TINTS.clear}">
           ${this._taskHead(t, this._statusText(t) + this._nextLine(t))}
           <div class="facts">
             <span class="fact">${ICON.clock}${esc(this._scheduleText(t))}</span>
             <span class="fact">${esc(assignee)}</span>
-            ${t.notify === false ? `<span class="fact">No reminders</span>` : ""}
+            ${t.notify === false ? `<span class="fact">${this._t("no_reminders")}</span>` : ""}
           </div>
-          ${history ? `<ul class="history">${history}</ul>` : `<p class="muted" style="margin-top:18px">Not done yet.</p>`}
+          ${history ? `<ul class="history">${history}</ul>` : `<p class="muted" style="margin-top:18px">${this._t("not_done_yet")}</p>`}
           <div class="actions">
-            <button data-action="d-done">${ICON.check}<span>${todo ? "Mark done" : "Mark done again"}</span></button>
-            ${(t.history || []).length ? `<button data-action="d-undo">${ICON.undo}<span>Undo last</span></button>` : ""}
-            <button data-action="d-edit">${ICON.edit}<span>Edit</span></button>
+            <button data-action="d-done">${ICON.check}<span>${this._t(todo ? "mark_done" : "mark_again")}</span></button>
+            ${(t.history || []).length ? `<button data-action="d-undo">${ICON.undo}<span>${this._t("undo_last")}</span></button>` : ""}
+            <button data-action="d-edit">${ICON.edit}<span>${this._t("edit")}</span></button>
             <span style="flex:1"></span>
-            <button data-action="d-close">${ICON.close}<span>Close</span></button>
+            <button data-action="d-close">${ICON.close}<span>${this._t("close")}</span></button>
           </div>
           <div class="err" style="margin-top:10px"></div>
         </div>`;
@@ -1139,60 +1354,61 @@
       const scrollTop = scrim.querySelector(".sheet") ? scrim.querySelector(".sheet").scrollTop : 0;
       const people = this._people();
       const tab = (k, label) => `<button class="${ed.repeat === k ? "on" : ""}" data-action="e-repeat" data-repeat="${k}">${label}</button>`;
+      const settled = scrim.querySelector(".sheet") ? " settled" : "";
       scrim.innerHTML = `
-        <div class="sheet glass" style="--tint:${TINTS[ed.tint] || TINTS.clear}">
-          <div class="sheet-head"><h2>${ed.id ? "Edit task" : "New task"}</h2><button class="icon-btn" data-action="e-close" aria-label="Close">${ICON.close}</button></div>
+        <div class="sheet glass${settled}" style="--tint:${TINTS[ed.tint] || TINTS.clear}">
+          <div class="sheet-head"><h2>${this._t(ed.id ? "edit_task" : "new_task")}</h2><button class="icon-btn" data-action="e-close" aria-label="${this._t("close")}">${ICON.close}</button></div>
           <section class="step">
-            <h3 class="step-h"><i>1</i>What needs doing?</h3>
+            <h3 class="step-h"><i>1</i>${this._t("step_what")}</h3>
             <div class="pform-top">
               <span class="t-icon">${esc(ed.icon)}</span>
-              <input id="gt-e-title" class="field" maxlength="60" placeholder="For example: Feed the dog" value="${esc(ed.title)}" autocomplete="off">
+              <input id="gt-e-title" class="field" maxlength="60" placeholder="${esc(this._t("title_ph"))}" value="${esc(ed.title)}" autocomplete="off">
             </div>
-            ${ed.id ? "" : `<div class="presets">${PRESETS.map((p, i) => `<button class="chip text" data-action="e-preset" data-i="${i}">${esc(p.icon)} ${esc(p.title)}</button>`).join("")}</div>`}
-            <div class="label">Icon</div>
-            <div class="emoji-grid">${TASK_ICONS.map((e) => `<button class="emoji ${e === ed.icon ? "on" : ""}" data-action="e-icon" data-emoji="${e}" aria-label="Icon ${e}">${e}</button>`).join("")}</div>
+            ${ed.id ? "" : `<div class="presets">${PRESETS.map((p, i) => `<button class="chip text" data-action="e-preset" data-i="${i}">${esc(p.icon)} ${esc(this._t(p.key))}</button>`).join("")}</div>`}
+            <div class="label">${this._t("icon")}</div>
+            <div class="emoji-grid">${TASK_ICONS.map((e) => `<button class="emoji ${e === ed.icon ? "on" : ""}" data-action="e-icon" data-emoji="${e}" aria-label="${esc(this._t("icon_e", { e }))}">${e}</button>`).join("")}</div>
           </section>
           <section class="step">
-            <h3 class="step-h"><i>2</i>How often?</h3>
-            <div class="tabs">${tab("daily", "Every day")}${tab("weekly", "Certain days")}${tab("every", "Every few days")}</div>
+            <h3 class="step-h"><i>2</i>${this._t("step_often")}</h3>
+            <div class="tabs">${tab("daily", this._t("rep_daily"))}${tab("weekly", this._t("rep_weekly"))}${tab("every", this._t("rep_every"))}</div>
             ${
               ed.repeat === "weekly"
                 ? `<div class="days">${DAY_INDEX.map((d) => `<button class="chip text ${ed.days.includes(d) ? "on" : ""}" data-action="e-day" data-d="${d}" aria-pressed="${ed.days.includes(d)}">${esc(this._dayName(d))}</button>`).join("")}</div>`
                 : ed.repeat === "every"
-                  ? `<div class="stepper"><button class="icon-btn" data-action="e-every" data-step="-1" aria-label="Fewer days">−</button><b>Every ${ed.every_days} day${ed.every_days > 1 ? "s" : ""}</b><button class="icon-btn" data-action="e-every" data-step="1" aria-label="More days">${ICON.plus}</button></div>
-                     <p class="muted">Counted from the last time it was done.</p>`
-                  : `<p class="muted">${ed.times.length > 1 ? `${ed.times.length} times a day — once for each time below.` : "Once a day. Add a second time below for twice a day."}</p>`
+                  ? `<div class="stepper"><button class="icon-btn" data-action="e-every" data-step="-1" aria-label="${this._t("fewer_days")}">−</button><b>${esc(ed.every_days > 1 ? this._t("every_n", { n: ed.every_days }) : this._t("every_day"))}</b><button class="icon-btn" data-action="e-every" data-step="1" aria-label="${this._t("more_days")}">${ICON.plus}</button></div>
+                     <p class="muted">${this._t("counted")}</p>`
+                  : `<p class="muted">${ed.times.length > 1 ? this._t("n_times_hint", { n: ed.times.length }) : this._t("once_hint")}</p>`
             }
           </section>
           <section class="step">
-            <h3 class="step-h"><i>3</i>Done by <small>(optional)</small></h3>
+            <h3 class="step-h"><i>3</i>${this._t("step_by")} <small>${this._t("optional")}</small></h3>
             <div class="time-list">
-              ${ed.times.map((t) => `<span class="time-chip">${esc(this._hhmm(t))}<button data-action="e-untime" data-t="${t}" aria-label="Remove ${esc(this._hhmm(t))}">${ICON.close}</button></span>`).join("") || `<span class="muted">Any time that day.</span>`}
+              ${ed.times.map((t) => `<span class="time-chip">${esc(this._hhmm(t))}<button data-action="e-untime" data-t="${t}" aria-label="${esc(this._t("remove_x", { x: this._hhmm(t) }))}">${ICON.close}</button></span>`).join("") || `<span class="muted">${this._t("any_time")}</span>`}
             </div>
             <div class="row">
-              ${QUICK_TIMES.filter((q) => !ed.times.includes(q.t)).map((q) => `<button class="chip text" data-action="e-time" data-t="${q.t}">${q.label} · ${esc(this._hhmm(q.t))}</button>`).join("")}
+              ${QUICK_TIMES.filter((q) => !ed.times.includes(q.t)).map((q) => `<button class="chip text" data-action="e-time" data-t="${q.t}">${esc(this._t(q.key))} · ${esc(this._hhmm(q.t))}</button>`).join("")}
             </div>
-            <div class="row"><input id="gt-e-time" class="field" type="time" value="${esc(ed.newTime)}" aria-label="Another time"><button class="small-btn" data-action="e-time-add">Add time</button></div>
+            <div class="row"><input id="gt-e-time" class="field" type="time" value="${esc(ed.newTime)}" aria-label="${this._t("another_time")}"><button class="small-btn" data-action="e-time-add">${this._t("add_time")}</button></div>
           </section>
           <section class="step">
-            <h3 class="step-h"><i>4</i>Whose job?</h3>
+            <h3 class="step-h"><i>4</i>${this._t("step_whose")}</h3>
             <div class="tiles">
-              <button class="tile ${ed.assignee === "everyone" ? "on" : ""}" data-action="e-who" data-id="everyone"><span class="everyone-av">🏡</span><span>Everyone</span></button>
+              <button class="tile ${ed.assignee === "everyone" ? "on" : ""}" data-action="e-who" data-id="everyone"><span class="everyone-av">🏡</span><span>${esc(this._t("everyone"))}</span></button>
               ${people.map((p) => this._tile(p, "e-who", ed.assignee === p.id)).join("")}
             </div>
-            ${people.length ? "" : `<p class="muted">Add people with the <b>People</b> button to give someone a task.</p>`}
+            ${people.length ? "" : `<p class="muted">${this._t("people_hint_html")}</p>`}
           </section>
-          <button class="more ${ed.more ? "open" : ""}" data-action="e-more">${ICON.chevron}<span>More options: colour, reminders</span></button>
+          <button class="more ${ed.more ? "open" : ""}" data-action="e-more">${ICON.chevron}<span>${this._t("more_opts")}</span></button>
           <div ${ed.more ? "" : "hidden"}>
-            <div class="row"><label>Colour</label><div class="chips">${Object.keys(TINTS)
-              .map((k) => `<button class="tint-dot ${ed.tint === k ? "on" : ""}" data-action="e-tint" data-tint="${k}" style="--tint:${TINTS[k]}" aria-label="${k}" title="${k}"></button>`)
+            <div class="row"><label>${this._t("colour")}</label><div class="chips">${Object.keys(TINTS)
+              .map((k) => `<button class="tint-dot ${ed.tint === k ? "on" : ""}" data-action="e-tint" data-tint="${k}" style="--tint:${TINTS[k]}" aria-label="${this._t(`tint_${k}`)}" title="${this._t(`tint_${k}`)}"></button>`)
               .join("")}</div></div>
-            <div class="toggle-row"><span>Remind on phones when it's overdue</span><button class="switch ${ed.notify ? "on" : ""}" data-action="e-notify" role="switch" aria-checked="${ed.notify}" aria-label="Remind when overdue"></button></div>
+            <div class="toggle-row"><span>${this._t("remind_label")}</span><button class="switch ${ed.notify ? "on" : ""}" data-action="e-notify" role="switch" aria-checked="${ed.notify}" aria-label="${this._t("remind_aria")}"></button></div>
           </div>
           <div class="sheet-foot">
             <span class="err">${esc(ed.error)}</span>
-            ${ed.id ? `<button class="ghost-btn danger" data-action="e-delete">${ICON.trash}<span>${ed.confirm ? "Tap again to delete" : "Delete"}</span></button>` : ""}
-            <button class="primary" data-action="e-save">${ICON.check}<span>${ed.id ? "Save" : "Add task"}</span></button>
+            ${ed.id ? `<button class="ghost-btn danger" data-action="e-delete">${ICON.trash}<span>${this._t(ed.confirm ? "tap_delete" : "delete")}</span></button>` : ""}
+            <button class="primary" data-action="e-save">${ICON.check}<span>${this._t(ed.id ? "save" : "add_task")}</span></button>
           </div>
         </div>`;
       const sheet = scrim.querySelector(".sheet");
@@ -1208,11 +1424,11 @@
       const ed = this._editor;
       if (!ed || ed.saving) return;
       if (!ed.title.trim()) {
-        ed.error = "Give the task a name.";
+        ed.error = this._t("err_name");
         return this._renderEditor();
       }
       if (ed.repeat === "weekly" && !ed.days.length) {
-        ed.error = "Pick at least one day.";
+        ed.error = this._t("err_day");
         return this._renderEditor();
       }
       const payload = {
@@ -1253,7 +1469,7 @@
           return this._saveTask();
         case "e-preset": {
           const p = PRESETS[Number(el.dataset.i)];
-          Object.assign(ed, { title: p.title, icon: p.icon, repeat: p.repeat, days: [...(p.days || [])], every_days: p.every_days || ed.every_days, times: [...p.times] });
+          Object.assign(ed, { title: this._t(p.key), icon: p.icon, repeat: p.repeat, days: [...(p.days || [])], every_days: p.every_days || ed.every_days, times: [...p.times] });
           break;
         }
         case "e-icon":
@@ -1366,26 +1582,27 @@
       const option = (key, t) => `
         <button class="bg-opt ${current === key ? "on" : ""}" data-action="l-preset" data-preset="${key}" aria-pressed="${current === key}">
           <span class="bg-prev" style="${this._prevStyle(t)}"><i></i><i></i></span>
-          <span class="bg-name"><span>${esc(t.name)}${key === DEFAULT_BACKGROUND ? " <small>Default</small>" : ""}</span>${current === key ? ICON.check : ""}</span>
+          <span class="bg-name"><span>${esc(this._t(`bg_${key}`))}${key === DEFAULT_BACKGROUND ? ` <small>${this._t("default")}</small>` : ""}</span>${current === key ? ICON.check : ""}</span>
         </button>`;
+      const settled = scrim.querySelector(".sheet") ? " settled" : "";
       scrim.innerHTML = `
-        <div class="sheet glass">
-          <div class="sheet-head"><h2>Background</h2><button class="icon-btn" data-action="l-close" aria-label="Close">${ICON.close}</button></div>
-          <p class="lead">Pick a colour theme for the board. It changes on every screen showing this board.</p>
+        <div class="sheet glass${settled}">
+          <div class="sheet-head"><h2>${this._t("background")}</h2><button class="icon-btn" data-action="l-close" aria-label="${this._t("close")}">${ICON.close}</button></div>
+          <p class="lead">${this._t("look_lead")}</p>
           <div class="bg-grid">${Object.entries(BACKGROUNDS).map(([k, t]) => option(k, t)).join("")}</div>
           <section class="people-sec card-inset">
-            <h3>Your own colours</h3>
+            <h3>${this._t("own_colours")}</h3>
             <div class="custom-row">
               ${ui.custom
-                .map((c, i) => `<label class="color-field">Colour ${i + 1}<input id="gm-l-c${i}" type="color" value="${esc(c)}" data-ci="${i}"></label>`)
+                .map((c, i) => `<label class="color-field">${this._t("colour_n", { n: i + 1 })}<input id="gm-l-c${i}" type="color" value="${esc(c)}" data-ci="${i}"></label>`)
                 .join("")}
               <span class="bg-prev custom-prev" style="${this._prevStyle(this._resolveBackground({ preset: "custom", colors: ui.custom }))};flex:1;min-width:120px;height:48px"><i></i></span>
             </div>
-            <p class="muted">Changing a colour previews it right away. Select <b>Use my colours</b> to keep it.</p>
+            <p class="muted">${this._t("look_hint_html")}</p>
             <div class="pform-foot">
               <span class="err">${esc(ui.error)}</span>
-              ${current === "custom" ? `<span class="muted">${ICON.check} In use</span>` : ""}
-              <button class="primary" data-action="l-custom">Use my colours</button>
+              ${current === "custom" ? `<span class="muted">${ICON.check} ${this._t("in_use")}</span>` : ""}
+              <button class="primary" data-action="l-custom">${this._t("use_mine")}</button>
             </div>
           </section>
         </div>`;
@@ -1470,53 +1687,54 @@
       const ha = this._haPeople();
       const haOn = !(this._settings && this._settings.include_ha_people === false);
       const scrollTop = scrim.querySelector(".sheet") ? scrim.querySelector(".sheet").scrollTop : 0;
+      const settled = scrim.querySelector(".sheet") ? " settled" : "";
       scrim.innerHTML = `
-        <div class="sheet glass">
-          <div class="sheet-head"><h2>People</h2><button class="icon-btn" data-action="p-close" aria-label="Close">${ICON.close}</button></div>
-          <p class="lead">Add everyone who helps out. Tap their face to say who did a task, or give them tasks of their own.</p>
+        <div class="sheet glass${settled}">
+          <div class="sheet-head"><h2>${this._t("people")}</h2><button class="icon-btn" data-action="p-close" aria-label="${this._t("close")}">${ICON.close}</button></div>
+          <p class="lead">${this._t("people_lead")}</p>
           <section class="card-inset">
-            <h3>${ui.editId ? "Edit person" : "Add a person"}</h3>
+            <h3>${this._t(ui.editId ? "edit_person" : "add_a_person")}</h3>
             <div class="pform-top">
               ${this._avatar({ id: "preview", name: ui.name || "?", emoji: ui.emoji, hue: ui.hue }, "xl")}
-              <input id="gm-p-name" class="field" maxlength="40" placeholder="Name, for example Maya" value="${esc(ui.name)}" autocomplete="off">
+              <input id="gm-p-name" class="field" maxlength="40" placeholder="${esc(this._t("name_ph"))}" value="${esc(ui.name)}" autocomplete="off">
             </div>
-            <div class="label">Picture</div>
-            <div class="emoji-grid">${MEMBER_EMOJI.map((e) => `<button class="emoji ${e === ui.emoji ? "on" : ""}" data-action="p-emoji" data-emoji="${e}" aria-label="Picture ${e}">${e}</button>`).join("")}</div>
-            <div class="label">Colour</div>
-            <div class="hues">${HUES.map((h) => `<button class="hue ${h === ui.hue ? "on" : ""}" data-action="p-hue" data-hue="${h}" style="--h:${h}" aria-label="Colour"></button>`).join("")}</div>
-            <div class="label">Remind them on their phone when their task is overdue <span class="opt">(optional)</span></div>
+            <div class="label">${this._t("picture")}</div>
+            <div class="emoji-grid">${MEMBER_EMOJI.map((e) => `<button class="emoji ${e === ui.emoji ? "on" : ""}" data-action="p-emoji" data-emoji="${e}" aria-label="${esc(this._t("picture_e", { e }))}">${e}</button>`).join("")}</div>
+            <div class="label">${this._t("colour")}</div>
+            <div class="hues">${HUES.map((h) => `<button class="hue ${h === ui.hue ? "on" : ""}" data-action="p-hue" data-hue="${h}" style="--h:${h}" aria-label="${this._t("colour")}"></button>`).join("")}</div>
+            <div class="label">${this._t("notify_label")} <span class="opt">${this._t("optional")}</span></div>
             <select id="gm-p-notify" class="field">
-              <option value="">Don't notify</option>
+              <option value="">${this._t("dont_notify")}</option>
               ${services.map((s) => `<option value="${esc(s.value)}" ${s.value === ui.notify ? "selected" : ""}>${esc(s.label)}</option>`).join("")}
             </select>
-            ${services.length ? "" : `<p class="muted">Install the Home Assistant app on a phone to enable notifications.</p>`}
+            ${services.length ? "" : `<p class="muted">${this._t("install_app")}</p>`}
             <div class="pform-foot">
               <span class="err">${esc(ui.error)}</span>
-              ${ui.editId ? `<button class="ghost-btn" data-action="p-cancel">Cancel</button>` : ""}
-              <button class="primary" data-action="p-save">${ui.editId ? "Save changes" : `${ICON.plus}<span>Add person</span>`}</button>
+              ${ui.editId ? `<button class="ghost-btn" data-action="p-cancel">${this._t("cancel")}</button>` : ""}
+              <button class="primary" data-action="p-save">${ui.editId ? this._t("save_changes") : `${ICON.plus}<span>${this._t("add_person")}</span>`}</button>
             </div>
           </section>
           <section class="people-sec">
-            <h3>On the board</h3>
+            <h3>${this._t("on_board")}</h3>
             ${
               members.length
                 ? members
                     .map(
                       (m) => `<div class="person-row">${this._avatar({ id: m.id, name: m.name, emoji: m.emoji, hue: m.hue })}
-                  <div class="pinfo"><b>${esc(m.name)}</b><small>${m.notify && m.notify.length ? `Notifies ${esc(label(m.notify[0]))}` : "No notifications"}</small></div>
-                  <button class="ghost-btn" data-action="p-edit" data-id="${esc(m.id)}">${ICON.edit}<span>Edit</span></button>
-                  <button class="ghost-btn danger" data-action="p-remove" data-id="${esc(m.id)}">${ui.confirm === m.id ? "Tap again to remove" : "Remove"}</button></div>`
+                  <div class="pinfo"><b>${esc(m.name)}</b><small>${m.notify && m.notify.length ? esc(this._t("notifies", { x: label(m.notify[0]) })) : this._t("no_notifications")}</small></div>
+                  <button class="ghost-btn" data-action="p-edit" data-id="${esc(m.id)}">${ICON.edit}<span>${this._t("edit")}</span></button>
+                  <button class="ghost-btn danger" data-action="p-remove" data-id="${esc(m.id)}">${this._t(ui.confirm === m.id ? "tap_remove" : "remove")}</button></div>`
                     )
                     .join("")
-                : `<p class="muted">No one yet. Add the first person above.</p>`
+                : `<p class="muted">${this._t("no_one")}</p>`
             }
           </section>
           ${
             ha.length
               ? `<section class="people-sec">
-            <div class="sec-head"><h3>Home Assistant users</h3><button class="switch ${haOn ? "on" : ""}" data-action="p-ha" role="switch" aria-checked="${haOn}" aria-label="Show Home Assistant users"></button></div>
-            <p class="muted">${haOn ? "These people from Home Assistant are also on the board." : "Hidden. Turn on to also show people from Home Assistant."}</p>
-            ${haOn ? ha.map((p) => `<div class="person-row">${this._avatar(p)}<div class="pinfo"><b>${esc(p.name)}</b><small>From Home Assistant</small></div></div>`).join("") : ""}
+            <div class="sec-head"><h3>${this._t("ha_users")}</h3><button class="switch ${haOn ? "on" : ""}" data-action="p-ha" role="switch" aria-checked="${haOn}" aria-label="${this._t("show_ha")}"></button></div>
+            <p class="muted">${this._t(haOn ? "ha_on" : "ha_off")}</p>
+            ${haOn ? ha.map((p) => `<div class="person-row">${this._avatar(p)}<div class="pinfo"><b>${esc(p.name)}</b><small>${this._t("from_ha")}</small></div></div>`).join("") : ""}
           </section>`
               : ""
           }
@@ -1530,7 +1748,7 @@
       if (!ui) return;
       const name = (ui.name || "").trim();
       if (!name) {
-        ui.error = "Please type a name.";
+        ui.error = this._t("type_name_err");
         return this._renderPeople();
       }
       const payload = { type: "glass_tasks/member/save", name, emoji: ui.emoji, hue: ui.hue, notify: ui.notify ? [ui.notify] : [] };
@@ -1640,7 +1858,7 @@
       const paint = () => {
         if (!list.length) {
           spot.style.setProperty("--tint", DONE_TINT);
-          spot.innerHTML = `<div class="spot-row"><span class="t-icon">🎉</span><div><div class="t-title">All done for now</div><div class="t-status">Nothing is due right now.</div></div></div>`;
+          spot.innerHTML = `<div class="spot-row"><span class="t-icon">🎉</span><div><div class="t-title">${this._t("all_done")}</div><div class="t-status">${this._t("nothing_due")}</div></div></div>`;
         } else {
           const t = list[this._spotIndex % list.length];
           spot.style.setProperty("--tint", t.status === "overdue" ? OVERDUE_TINT : TINTS[t.tint] || TINTS.clear);

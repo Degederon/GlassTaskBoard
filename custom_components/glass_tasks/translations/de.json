@@ -1,0 +1,118 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Glass Task Board",
+        "description": "Fügt eine Tafel für wiederkehrende Aufgaben im Haushalt hinzu. Die Glas-Karte wird automatisch geladen – füge sie einem Dashboard als „Glass Task Board“ hinzu."
+      }
+    },
+    "abort": {
+      "already_configured": "Die Aufgabentafel ist bereits eingerichtet.",
+      "single_instance_allowed": "Die Aufgabentafel ist bereits eingerichtet."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Erinnerungen bei Überfälligkeit",
+        "description": "Wähle für jede Person den oder die Benachrichtigungsdienste, die sie erinnern, wenn eine ihrer Aufgaben überfällig ist (zum Beispiel notify.mobile_app_pixel). Aufgaben für „Alle“ erinnern jede Person unten. Personen, die auf der Tafel selbst angelegt wurden, richtest du im Personen-Bildschirm der Karte ein.",
+        "data": {
+          "notify_everyone": "Zusätzliche Dienste für Aufgaben, die alle betreffen",
+          "notify_url": "Diesen Dashboard-Pfad öffnen, wenn auf eine Erinnerung getippt wird (z. B. /lovelace/tasks)"
+        }
+      }
+    }
+  },
+  "services": {
+    "complete": {
+      "name": "Aufgabe erledigen",
+      "description": "Eine Aufgabe als erledigt markieren, als hätte jemand auf der Tafel darauf getippt.",
+      "fields": {
+        "task": {
+          "name": "Aufgabe",
+          "description": "Der Name der Aufgabe (zum Beispiel „Hund füttern“) oder ihre ID."
+        },
+        "by": {
+          "name": "Erledigt von",
+          "description": "Die Person, die es gemacht hat (eine Personen-Entität oder die ID eines Tafel-Mitglieds). Leer lassen für den Benutzer, der die Aktion ausführt."
+        }
+      }
+    },
+    "undo": {
+      "name": "Letztes Erledigt zurücknehmen",
+      "description": "Das letzte Mal zurücknehmen, als eine Aufgabe als erledigt markiert wurde.",
+      "fields": {
+        "task": {
+          "name": "Aufgabe",
+          "description": "Der Name oder die ID der Aufgabe."
+        }
+      }
+    },
+    "add_task": {
+      "name": "Aufgabe hinzufügen",
+      "description": "Eine wiederkehrende Aufgabe zur Tafel hinzufügen.",
+      "fields": {
+        "title": {
+          "name": "Name",
+          "description": "Was zu tun ist, zum Beispiel „Pflanzen gießen“."
+        },
+        "icon": {
+          "name": "Symbol",
+          "description": "Ein Emoji für die Kachel."
+        },
+        "repeat": {
+          "name": "Wiederholung",
+          "description": "Jeden Tag, an bestimmten Wochentagen oder alle paar Tage, gezählt ab dem letzten Erledigen."
+        },
+        "days": {
+          "name": "Wochentage",
+          "description": "Für „bestimmte Tage“. 0 ist Montag, 6 ist Sonntag."
+        },
+        "every_days": {
+          "name": "Alle wie viele Tage",
+          "description": "Für „alle paar Tage“."
+        },
+        "times": {
+          "name": "Erledigt bis",
+          "description": "Eine oder mehrere Uhrzeiten, etwa 08:00 und 18:00. Leer lassen für „irgendwann an dem Tag“."
+        },
+        "assignee": {
+          "name": "Wessen Aufgabe",
+          "description": "everyone, eine Personen-Entität oder die ID eines Tafel-Mitglieds."
+        },
+        "tint": {
+          "name": "Farbe",
+          "description": "Die Farbe der Kachel."
+        },
+        "notify": {
+          "name": "Bei Überfälligkeit erinnern",
+          "description": "Handy-Erinnerungen senden, wenn die Aufgabe überfällig ist."
+        }
+      }
+    },
+    "delete_task": {
+      "name": "Aufgabe entfernen",
+      "description": "Eine Aufgabe von der Tafel entfernen.",
+      "fields": {
+        "task": {
+          "name": "Aufgabe",
+          "description": "Der Name oder die ID der Aufgabe."
+        }
+      }
+    },
+    "set_background": {
+      "name": "Hintergrund festlegen",
+      "description": "Das Farbthema der Tafel auf jedem Bildschirm ändern. Nutze eine Vorlage oder „custom“ mit drei Farben.",
+      "fields": {
+        "preset": {
+          "name": "Thema",
+          "description": "Eine der elf Vorlagen oder „custom“."
+        },
+        "colors": {
+          "name": "Eigene Farben",
+          "description": "Drei Farben für „custom“, etwa „#3366ff, #ff66aa, #22ccbb“."
+        }
+      }
+    }
+  }
+}
