@@ -20,20 +20,46 @@ Glass Task Board is the companion to [Glass Message Board](https://github.com/De
 
 **Languages:** English, German (Deutsch), Spanish (Español) and French (Français). The board, its settings and its reminders follow your Home Assistant language.
 
-## Quick install
+## Quick start
+
+### Install
 
 1. **Add the repository.** In Home Assistant, go to **Settings → Marketplace → Add via link** (on versions before 2026.11, use **HACS → ⋮ → Custom repositories**). Paste `https://github.com/Degederon/GlassTaskBoard` and choose **Integration**.
 2. **Install it.** Open **Glass Task Board**, select **Install**, then restart Home Assistant.
 3. **Turn it on.** Go to **Settings → Devices & services → + Add integration**, search for **Glass Task Board**, and select **Submit**.
 4. **Refresh your browser.** Press **Ctrl + Shift + R** (Mac: **Cmd + Shift + R**). In the companion app, use **Settings → Companion app → Debugging → Reset frontend cache**.
-5. **Add the board.** Open a dashboard, select the **pencil**, then **+ Add card**, and search for **Glass Task Board**. On a wall tablet, set the view type to **Panel** so the board fills the screen.
-6. **Start using it.** On the board, tap **People** to add everyone in your home, then **New task**.
+
+### Make a dashboard
+
+1. Go to **Settings → Dashboards → + Add dashboard → New dashboard from scratch**.
+2. Name it `Household Tasks` and select **Create**, then open it from the sidebar.
+3. Select the **pencil**, then **⋮ → Raw configuration editor**.
+4. Replace everything with this, then select **Save** and **Done**:
+
+   ```yaml
+   views:
+     - title: Tasks
+       type: panel
+       cards:
+         - type: custom:glass-task-board
+           title: Household tasks
+   ```
+
+You now have a full-screen board, ready for a wall tablet. To add the board to an existing dashboard instead, select the **pencil**, then **+ Add card**, and search for **Glass Task Board**.
+
+### Configure
+
+1. **Add your household.** On the board, tap **People**. Enter each person's name and pick a picture and colour. To send someone reminders, choose their phone under **Remind them on their phone**.
+2. **Add tasks.** Tap **New task**, pick a ready-made task or type your own, then choose how often it repeats, when it's due, and whose job it is. Select **Add task**.
+3. **Pick a look (optional).** Tap the **palette** button to choose one of the eleven colour themes, or mix your own.
+4. **Adjust the card (optional).** Edit the dashboard, select the board, and change the title, tile width, idle time before the clock appears, and whether done tasks are grouped last. All options are listed under [Dashboard configuration](#dashboard-configuration).
+5. **Reminders for Home Assistant users (optional).** People added on the board get their phone in step 1. For Home Assistant users, go to **Settings → Devices & services → Glass Task Board → Configure** and pick a phone for each person.
 
 Need more detail? See the full [step-by-step setup](#step-by-step-setup) below.
 
 ## Contents
 
-- [Quick install](#quick-install)
+- [Quick start](#quick-start)
 - [Features](#features)
 - [Take a tour](#take-a-tour)
 - [Requirements](#requirements)
