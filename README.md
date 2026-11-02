@@ -20,8 +20,20 @@ Glass Task Board is the companion to [Glass Message Board](https://github.com/De
 
 **Languages:** English, German (Deutsch), Spanish (Español) and French (Français). The board, its settings and its reminders follow your Home Assistant language.
 
+## Quick install
+
+1. **Add the repository.** In Home Assistant, go to **Settings → Marketplace → Add via link** (on versions before 2026.11, use **HACS → ⋮ → Custom repositories**). Paste `https://github.com/Degederon/GlassTaskBoard` and choose **Integration**.
+2. **Install it.** Open **Glass Task Board**, select **Install**, then restart Home Assistant.
+3. **Turn it on.** Go to **Settings → Devices & services → + Add integration**, search for **Glass Task Board**, and select **Submit**.
+4. **Refresh your browser.** Press **Ctrl + Shift + R** (Mac: **Cmd + Shift + R**). In the companion app, use **Settings → Companion app → Debugging → Reset frontend cache**.
+5. **Add the board.** Open a dashboard, select the **pencil**, then **+ Add card**, and search for **Glass Task Board**. On a wall tablet, set the view type to **Panel** so the board fills the screen.
+6. **Start using it.** On the board, tap **People** to add everyone in your home, then **New task**.
+
+Need more detail? See the full [step-by-step setup](#step-by-step-setup) below.
+
 ## Contents
 
+- [Quick install](#quick-install)
 - [Features](#features)
 - [Take a tour](#take-a-tour)
 - [Requirements](#requirements)
