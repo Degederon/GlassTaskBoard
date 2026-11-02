@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.4.0] - 2026-11-02
+
+### Added
+
+- A **Home** button in the top-left corner of the board. Set the card option `home_path` to the dashboard it should go to, for example `/lovelace/0`; leave it empty to hide the button. Handy on a wall tablet with no sidebar.
+- The ready-to-go dashboard now has a Home button in the top-left corner of both views.
+
 ## [0.3.0] - 2026-11-02
 
 ### Added

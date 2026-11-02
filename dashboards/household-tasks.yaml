@@ -7,6 +7,8 @@
 #
 # Board: the glass board, full screen, for a wall tablet.
 # Today: what's due, every task at a glance, and what got done today.
+# Home buttons (top left on both views) go to "/", your default dashboard.
+# To go somewhere else, change both "/" paths, e.g. to /lovelace/0.
 # Nothing to edit: the Today view finds every task on its own.
 title: Household Tasks
 views:
@@ -20,6 +22,7 @@ views:
         ambient_after: 120
         column_width: 260
         show_clock: true
+        home_path: /
         alert_overdue: true
         alert_sound: false
         alert_snooze: 15
@@ -32,15 +35,15 @@ views:
     sections:
       - type: grid
         cards:
-          - type: heading
-            heading: Right now
-            icon: mdi:clipboard-text-clock-outline
-          - type: tile
-            entity: sensor.glass_task_board_tasks_to_do
-            name: Tasks to do
-            icon: mdi:clipboard-alert-outline
+          - type: button
+            name: Home
+            icon: mdi:home
+            tap_action:
+              action: navigate
+              navigation_path: /
             grid_options:
               columns: 6
+              rows: 1
           - type: button
             name: Open board
             icon: mdi:view-dashboard-outline
@@ -50,6 +53,13 @@ views:
             grid_options:
               columns: 6
               rows: 1
+          - type: heading
+            heading: Right now
+            icon: mdi:clipboard-text-clock-outline
+          - type: tile
+            entity: sensor.glass_task_board_tasks_to_do
+            name: Tasks to do
+            icon: mdi:clipboard-alert-outline
           - type: markdown
             content: |-
               {%- set tasks = states.sensor | selectattr('attributes.task_id', 'defined') | list %}
@@ -109,12 +119,3 @@ views:
               - {{ t.attributes.icon_emoji or '✅' }} **{{ t.name }}** by {{ t.attributes.last_done_by or 'someone' }} at {{ at.strftime('%-I:%M %p') }}
               {%- endfor %}
               {%- endif %}
-          - type: button
-            name: Home
-            icon: mdi:home
-            tap_action:
-              action: navigate
-              navigation_path: /
-            grid_options:
-              columns: 12
-              rows: 1
