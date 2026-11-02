@@ -11,6 +11,7 @@ All notable changes to this project are documented in this file.
 
 ### Changed
 
+- A new app icon in the same style as Glass Message Board: two frosted-glass cards on the aurora background, the front one a checklist, with a mint badge holding a tick inside a repeat arrow.
 - The README now follows the same layout as Glass Message Board: a step-by-step setup, a picture tour, tables for options, actions, sensors and events, a Languages section with pictures of the board in each language, and troubleshooting.
 
 ### Fixed
