@@ -18,6 +18,7 @@ from typing import Any
 DAILY = "daily"
 WEEKLY = "weekly"
 EVERY = "every"
+ONCE = "once"
 
 DONE = "done"
 DUE = "due"
@@ -121,6 +122,8 @@ def compute(task: dict[str, Any], now: datetime) -> dict[str, Any]:
     tz = now.tzinfo
     if task.get("repeat") == EVERY:
         return _compute_every(task, now)
+    if task.get("repeat") == ONCE:
+        return _compute_once(task, now)
 
     today = now.date()
     completions = _completions(task, tz)
@@ -199,11 +202,43 @@ def _compute_every(task: dict[str, Any], now: datetime) -> dict[str, Any]:
     return _result(DUE, slot, None, None)
 
 
+def once_date(task: dict[str, Any], tz: tzinfo) -> date:
+    """The day a one-time task is for (the day it was set up, if no date was given)."""
+    try:
+        return date.fromisoformat(str(task.get("date")))
+    except (TypeError, ValueError):
+        since = _since(task, tz)
+        return since.date() if since else datetime.now(tz).date()
+
+
+def _compute_once(task: dict[str, Any], now: datetime) -> dict[str, Any]:
+    """One time, on a chosen day. Done once means done for good."""
+    tz = now.tzinfo
+    day = once_date(task, tz)
+    completions = _completions(task, tz)
+    # Only the first due time counts: a one-time task is done in one go.
+    slot = _day_slots(task, day, tz)[0]
+    if completions:
+        return _result(DONE, slot, None, completions[-1][1], 1, 1)
+    if now < slot.start:
+        return _result(UPCOMING, None, slot.due if slot.timed else slot.start, None)
+    if now >= slot.due:
+        # Its time (or its whole day) has passed: overdue until someone does it.
+        return _result(OVERDUE, slot, None, None, 1, 0)
+    return _result(DUE, slot, None, None, 1, 0)
+
+
 def describe(task: dict[str, Any]) -> str:
     """Short plain-English summary, e.g. 'Every day at 8:00 and 18:00'."""
     times = [t.strftime("%H:%M") for t in _times(task)]
     at = f" by {' and '.join(times)}" if times else ""
     repeat = task.get("repeat")
+    if repeat == ONCE:
+        try:
+            day = date.fromisoformat(str(task.get("date")))
+            return f"Once on {day.strftime('%a')} {day.day} {day.strftime('%b')}{at}"
+        except (TypeError, ValueError):
+            return f"Once{at}"
     if repeat == WEEKLY:
         names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
         days = ", ".join(names[d] for d in sorted(task.get("days") or []))

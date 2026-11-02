@@ -62,7 +62,7 @@
         },
         "repeat": {
           "name": "Repeats",
-          "description": "Every day, on certain days of the week, or every few days counted from when it was last done."
+          "description": "Every day, on certain days of the week, every few days counted from when it was last done, or one time on a chosen day."
         },
         "days": {
           "name": "Days of the week",
@@ -71,6 +71,10 @@
         "every_days": {
           "name": "Every how many days",
           "description": "For \"every few days\"."
+        },
+        "date": {
+          "name": "Day",
+          "description": "For \"one time\". The day it's for, like 2026-11-05. Leave empty for today."
         },
         "times": {
           "name": "Due by",

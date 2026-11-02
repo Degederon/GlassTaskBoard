@@ -62,7 +62,7 @@
         },
         "repeat": {
           "name": "Répétition",
-          "description": "Tous les jours, certains jours de la semaine, ou tous les quelques jours à compter de la dernière fois."
+          "description": "Tous les jours, certains jours de la semaine, tous les quelques jours à compter de la dernière fois, ou une seule fois un jour choisi."
         },
         "days": {
           "name": "Jours de la semaine",
@@ -71,6 +71,10 @@
         "every_days": {
           "name": "Tous les combien de jours",
           "description": "Pour « tous les quelques jours »."
+        },
+        "date": {
+          "name": "Jour",
+          "description": "Pour « une fois ». Le jour prévu, comme 2026-11-05. Laissez vide pour aujourd'hui."
         },
         "times": {
           "name": "Avant",

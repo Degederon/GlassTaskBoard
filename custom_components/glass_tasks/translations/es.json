@@ -62,7 +62,7 @@
         },
         "repeat": {
           "name": "Se repite",
-          "description": "Todos los días, ciertos días de la semana o cada pocos días contados desde la última vez."
+          "description": "Todos los días, ciertos días de la semana, cada pocos días contados desde la última vez, o una sola vez en un día elegido."
         },
         "days": {
           "name": "Días de la semana",
@@ -71,6 +71,10 @@
         "every_days": {
           "name": "Cada cuántos días",
           "description": "Para «cada pocos días»."
+        },
+        "date": {
+          "name": "Día",
+          "description": "Para «una vez». El día que toca, como 2026-11-05. Déjalo vacío para hoy."
         },
         "times": {
           "name": "Antes de",

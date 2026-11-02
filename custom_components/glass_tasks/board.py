@@ -23,6 +23,7 @@ from .const import (
     MAX_TASKS,
     REPEAT_DAILY,
     REPEAT_EVERY,
+    REPEAT_ONCE,
     REPEAT_WEEKLY,
     SIGNAL_UPDATED,
     STATUS_OVERDUE,
@@ -31,7 +32,7 @@ from .const import (
 )
 
 # Fields a task can be created or edited with.
-TASK_FIELDS = ("title", "icon", "tint", "assignee", "repeat", "days", "every_days", "times", "notify")
+TASK_FIELDS = ("title", "icon", "tint", "assignee", "repeat", "days", "every_days", "times", "date", "notify")
 # How much history the card receives (the store keeps more).
 CARD_HISTORY = 12
 
@@ -148,9 +149,15 @@ class TaskBoard:
         if task["repeat"] != REPEAT_EVERY:
             task["every_days"] = 1
         task["times"] = sorted(set(task.get("times") or []))
+        if task["repeat"] == REPEAT_ONCE:
+            # One time: on the chosen day (today if none), done in one go, so one due time at most.
+            task["date"] = task.get("date") or dt_util.now().date().isoformat()
+            task["times"] = task["times"][:1]
+        else:
+            task["date"] = None
         task["days"] = sorted(set(task.get("days") or []))
         task_id = task["id"]
-        if action == "added" or any(k in fields for k in ("repeat", "days", "every_days", "times")):
+        if action == "added" or any(k in fields for k in ("repeat", "days", "every_days", "times", "date")):
             # A new or changed schedule starts now: times already past today don't count against it.
             task["since"] = dt_util.utcnow().isoformat()
             task["nudged"] = None
@@ -202,6 +209,16 @@ class TaskBoard:
     def refresh(self, now: datetime | None = None) -> None:
         """Re-check every task (called every minute) and announce what changed."""
         now = now or dt_util.now()
+        # One-time tasks leave the board the day after they're done.
+        for task in list(self._tasks.values()):
+            if task.get("repeat") != REPEAT_ONCE or not task.get("history"):
+                continue
+            try:
+                done_on = dt_util.as_local(datetime.fromisoformat(task["history"][-1]["at"])).date()
+            except (KeyError, TypeError, ValueError):
+                continue
+            if done_on < now.date():
+                self.delete_task(task["id"])
         for task in self._tasks.values():
             old = self._states.get(task["id"], {})
             new = self._compute(task, now)

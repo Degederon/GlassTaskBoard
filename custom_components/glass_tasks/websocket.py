@@ -14,7 +14,7 @@ from . import helpers as h
 from .board import TaskBoard
 from .const import DATA_WS, DOMAIN, SIGNAL_UPDATED
 
-TASK_FIELDS = ("title", "icon", "tint", "assignee", "repeat", "days", "every_days", "times", "notify")
+TASK_FIELDS = ("title", "icon", "tint", "assignee", "repeat", "days", "every_days", "times", "date", "notify")
 
 
 @callback

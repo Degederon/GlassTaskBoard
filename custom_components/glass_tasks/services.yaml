@@ -56,6 +56,8 @@ add_task:
               value: weekly
             - label: Every few days (counted from when it was last done)
               value: every
+            - label: One time, on a chosen day
+              value: once
     days:
       name: Days of the week
       description: For "certain days". 0 is Monday, 6 is Sunday.
@@ -70,6 +72,12 @@ add_task:
         number:
           min: 1
           max: 365
+    date:
+      name: Day
+      description: For "one time". The day it's for, like 2026-11-05. Leave empty for today.
+      example: "2026-11-05"
+      selector:
+        date:
     times:
       name: Due by
       description: One or more times of day, like 08:00 and 18:00. Leave empty for "any time that day".

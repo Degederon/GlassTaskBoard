@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 DOMAIN = "glass_tasks"
-VERSION = "0.3.0"
+VERSION = "0.4.0"
 
 STORAGE_KEY = f"{DOMAIN}.board"
 STORAGE_VERSION = 1
@@ -32,7 +32,8 @@ TINTS = ["clear", "rose", "amber", "mint", "sky", "violet"]
 REPEAT_DAILY = "daily"  # every day, optionally several times a day
 REPEAT_WEEKLY = "weekly"  # on chosen weekdays (0 = Monday)
 REPEAT_EVERY = "every"  # every N days, counted from when it was last done
-REPEATS = [REPEAT_DAILY, REPEAT_WEEKLY, REPEAT_EVERY]
+REPEAT_ONCE = "once"  # one time, on a chosen date; leaves the board the day after it's done
+REPEATS = [REPEAT_DAILY, REPEAT_WEEKLY, REPEAT_EVERY, REPEAT_ONCE]
 
 # Task status, worked out from the schedule and the last time it was done.
 STATUS_DONE = "done"

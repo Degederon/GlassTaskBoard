@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.4.0] - 2026-11-02
+
+### Added
+
+- **One time** under **How often?**, for jobs that happen once, like calling the plumber on Thursday. Pick **Today**, **Tomorrow** or any day, with an optional due time. Before its day the tile says when; on the day it's due; if it's missed it stays overdue (with the reminder and pop-up) until someone does it. Once done it never comes back, and it leaves the board the day after.
+- `glass_tasks.add_task` takes `repeat: once` and a `date`.
+
+### Fixed
+
+- When a task was overdue, the **To do** filter button stretched across the header and glowed. It picked up the overdue pop-up's style by mistake.
+
 ## [0.3.0] - 2026-11-02
 
 ### Added

@@ -6,7 +6,7 @@
 
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/docs/faq/custom_repositories)
 [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.11%2B-18BCF2.svg?logo=homeassistant&logoColor=white)](https://www.home-assistant.io/)
-[![Version](https://img.shields.io/badge/version-0.3.0-6E56CF.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.4.0-6E56CF.svg)](CHANGELOG.md)
 [![Languages](https://img.shields.io/badge/languages-English%20%7C%20Deutsch%20%7C%20Espa%C3%B1ol%20%7C%20Fran%C3%A7ais-2E9E6B.svg)](#languages)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -79,6 +79,7 @@ Need more detail? See the full [step-by-step setup](#step-by-step-setup) below.
 |---|---|
 | **Tap, pick a face, done** | Tapping a task asks "Who did it?" with everyone's picture. The tile then shows who did it and when. |
 | **Resets on its own** | Every day, several times a day (feed the dog at 8 am *and* 6 pm), on certain weekdays (bins on Tuesday), or every few days counted from when it was last done (water the plants every 3 days). |
+| **One-time tasks too** | For jobs that happen once, like calling the plumber on Thursday. It's due on its day, stays overdue until someone does it, and leaves the board the day after it's done. |
 | **Overdue tasks stand out** | After their due time, tiles glow red and the person whose job it is (or everyone) gets a phone reminder. |
 | **Pop-up so nothing is missed** | When a task becomes overdue, a full-screen alert appears on the tablet, even over the ambient clock. Tap **Done** to say who did it, **Remind me in 15 min**, or **Got it**. An optional chime can play too. |
 | **Late still counts** | Feeding the dog at 8:30 counts as the morning feed, not the evening one. |
@@ -174,7 +175,7 @@ After installing or updating, refresh the page once so your browser loads the bo
 If you manage dashboards in YAML (`lovelace: mode: yaml` in `configuration.yaml`), the integration can't edit your resources. It loads the board on every page instead, so it still works. If you prefer to list it yourself, add this under `lovelace: resources:`:
 
 ```yaml
-- url: /glass_tasks/glass-task-board.js?v=0.3.0
+- url: /glass_tasks/glass-task-board.js?v=0.4.0
   type: module
 ```
 
@@ -235,7 +236,8 @@ To change someone later, open **People** and select **Edit** or **Remove** (sele
    - **Every day**. Add a second due time below to make it twice a day.
    - **Certain days**: tap the weekdays it's due.
    - **Every few days**: use **âˆ’** and **+**. The days are counted from the last time it was done.
-4. **Done by** (optional): tap **Morning**, **Noon**, **Evening** or **Bedtime**, or enter your own time and select **Add time**. Up to six times a day. With no time, the task can be done any time that day.
+   - **One time**: tap **Today** or **Tomorrow**, or pick a day. It's done in one go and leaves the board the day after it's done.
+4. **Done by** (optional): tap **Morning**, **Noon**, **Evening** or **Bedtime**, or enter your own time and select **Add time**. Up to six times a day (one for a one-time task). With no time, the task can be done any time that day.
 5. **Whose job?** Select a person, or **Everyone**.
 6. Optional: select **More options** to choose a tile colour, or to switch off phone reminders for this task.
 7. Select **Add task**.
@@ -320,7 +322,7 @@ For Home Assistant `person` entities, and for extra settings, go to **Settings â
 |---|---|---|
 | `glass_tasks.complete` | Marks a task done. | `task`, `by` |
 | `glass_tasks.undo` | Takes back the most recent "done". | `task` |
-| `glass_tasks.add_task` | Adds a task. Returns the task `id`. | `title`, `icon`, `repeat`, `days`, `every_days`, `times`, `assignee`, `tint`, `notify` |
+| `glass_tasks.add_task` | Adds a task. Returns the task `id`. | `title`, `icon`, `repeat`, `days`, `every_days`, `date`, `times`, `assignee`, `tint`, `notify` |
 | `glass_tasks.delete_task` | Removes a task. | `task` |
 | `glass_tasks.set_background` | Changes the board's colour theme on every screen. | `preset`, `colors` |
 
@@ -332,9 +334,10 @@ For Home Assistant `person` entities, and for extra settings, go to **Settings â
 |---|---|---|
 | `title` | Yes | What needs doing, up to 60 characters. |
 | `icon` | No | An emoji for the tile. |
-| `repeat` | No | `daily` (default), `weekly` or `every`. |
+| `repeat` | No | `daily` (default), `weekly`, `every` or `once`. |
 | `days` | No | For `weekly`: weekdays, where `0` is Monday and `6` is Sunday. |
 | `every_days` | No | For `every`: the number of days, from 1 to 365, counted from the last time it was done. |
+| `date` | No | For `once`: the day it's for, such as `2026-11-05`. Defaults to today. |
 | `times` | No | Up to six due times, such as `["08:00", "18:00"]`. Leave out for "any time that day". |
 | `assignee` | No | `everyone` (default), a `person` entity, or a board member ID. |
 | `tint` | No | One of `clear`, `rose`, `amber`, `mint`, `sky`, `violet`. Default `clear`. |
@@ -349,6 +352,18 @@ data:
   every_days: 3
   tint: mint
 response_variable: task
+```
+
+A one-time task, for example from a voice assistant or when a parcel is on its way:
+
+```yaml
+action: glass_tasks.add_task
+data:
+  title: Pick up the parcel
+  icon: ðŸ“¦
+  repeat: once
+  date: "2026-11-05"
+  times: ["17:00"]
 ```
 
 ## Entities and events

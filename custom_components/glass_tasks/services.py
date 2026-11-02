@@ -15,7 +15,7 @@ from .board import TaskBoard
 from .const import DOMAIN, MAX_TITLE
 
 SERVICES = ("complete", "undo", "add_task", "delete_task", "set_background")
-TASK_FIELDS = ("title", "icon", "tint", "assignee", "repeat", "days", "every_days", "times", "notify")
+TASK_FIELDS = ("title", "icon", "tint", "assignee", "repeat", "days", "every_days", "times", "date", "notify")
 
 TASK_REF = {vol.Required("task"): cv.string}
 COMPLETE_SCHEMA = vol.Schema({**TASK_REF, vol.Optional("by"): h.person_entity})

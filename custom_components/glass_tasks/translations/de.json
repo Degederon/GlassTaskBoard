@@ -62,7 +62,7 @@
         },
         "repeat": {
           "name": "Wiederholung",
-          "description": "Jeden Tag, an bestimmten Wochentagen oder alle paar Tage, gezählt ab dem letzten Erledigen."
+          "description": "Jeden Tag, an bestimmten Wochentagen, alle paar Tage (gezählt ab dem letzten Erledigen) oder einmalig an einem gewählten Tag."
         },
         "days": {
           "name": "Wochentage",
@@ -71,6 +71,10 @@
         "every_days": {
           "name": "Alle wie viele Tage",
           "description": "Für „alle paar Tage“."
+        },
+        "date": {
+          "name": "Tag",
+          "description": "Für „einmalig“. Der Tag, für den sie gilt, etwa 2026-11-05. Leer lassen für heute."
         },
         "times": {
           "name": "Erledigt bis",

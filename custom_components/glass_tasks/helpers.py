@@ -107,6 +107,16 @@ def time_of_day(value: Any) -> str:
     return f"{hours:02d}:{minutes:02d}"
 
 
+def iso_date(value: Any) -> str:
+    """Validate a day like '2026-11-05' for a one-time task."""
+    from datetime import date
+
+    try:
+        return date.fromisoformat(str(value).strip()[:10]).isoformat()
+    except ValueError as err:
+        raise vol.Invalid("date must look like 2026-11-05") from err
+
+
 def assignee(value: Any) -> str:
     """Whose job a task is: 'everyone', a person entity or a board member."""
     return recipient(value)
@@ -125,5 +135,6 @@ def task_fields() -> dict[Any, Any]:
         vol.Optional("days"): vol.All([vol.All(vol.Coerce(int), vol.Range(min=0, max=6))], vol.Length(max=7)),
         vol.Optional("every_days"): vol.All(vol.Coerce(int), vol.Range(min=1, max=MAX_EVERY_DAYS)),
         vol.Optional("times"): vol.All([time_of_day], vol.Length(max=MAX_TIMES)),
+        vol.Optional("date"): iso_date,
         vol.Optional("notify"): bool,
     }

@@ -85,10 +85,29 @@ case(
     at(3, 8).isoformat(),
 )
 
+# One time, on a chosen day
+call = task(repeat="once", date="2026-11-05", times=["10:00"])
+case("one-time before its day is upcoming", S.compute(call, at(3, 9))["status"], "upcoming")
+case("...and says when", S.compute(call, at(3, 9))["next_due"], at(5, 10).isoformat())
+case("one-time on its day is due", S.compute(call, at(5, 9))["status"], "due")
+case("one-time after its time is overdue", S.compute(call, at(5, 11))["status"], "overdue")
+case("one-time stays overdue days later", S.compute(call, at(8, 9))["status"], "overdue")
+called = task(repeat="once", date="2026-11-05", times=["10:00"], history=done(at(5, 9, 30)))
+case("one-time done", S.compute(called, at(5, 12))["status"], "done")
+case("one-time done never comes back", S.compute(called, at(12, 12))["status"], "done")
+case("one-time done has no next time", S.compute(called, at(5, 12))["next_due"], None)
+early_call = task(repeat="once", date="2026-11-05", history=done(at(3, 9)))
+case("one-time done early counts", S.compute(early_call, at(5, 12))["status"], "done")
+anytime = task(repeat="once", date="2026-11-05")
+case("untimed one-time is due all its day", S.compute(anytime, at(5, 23))["status"], "due")
+case("untimed one-time is overdue the next day", S.compute(anytime, at(6, 0, 30))["status"], "overdue")
+case("untimed one-time upcoming shows its day", S.compute(anytime, at(4, 9))["next_due"], at(5, 0).isoformat())
+
 # Descriptions
 case("describe twice a day", S.describe(task(**feed)), "2 times a day by 08:00 and 18:00")
 case("describe weekly", S.describe(bins), "Every Tue by 19:00")
 case("describe every 3 days", S.describe(plants), "Every 3 days")
+case("describe one time", S.describe(call), "Once on Thu 5 Nov by 10:00")
 
 failed = [c for c in CASES if c[1] != c[2]]
 for name, got, want in CASES:

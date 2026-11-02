@@ -5,7 +5,7 @@
  * No build step, no dependencies. Served automatically by the glass_tasks integration.
  */
 (() => {
-  const VERSION = "0.3.0";
+  const VERSION = "0.4.0";
   const TAG = "glass-task-board";
   if (customElements.get(TAG)) return;
 
@@ -44,6 +44,7 @@
   // in the viewer's Home Assistant profile; anything missing falls back to English.
   const STRINGS = {
     en: {
+      rep_once: "One time", once_on: "Once on {date}", st_on: "On {when}", once_note: "It's done in one go. Once it's done, it leaves the board the next day.", q_today: "Today", q_tomorrow: "Tomorrow", pick_day: "Day", err_date: "Pick a day.",
       alert_title: "Don't forget", alert_one: "This task is overdue.", alert_many: "{n} tasks are overdue.", alert_done: "Done", alert_snooze: "Remind me in {n} min", alert_ok: "Got it", cf_alert: "Pop up overdue tasks on this screen", cf_sound: "Play a chime with the pop-up", cf_snooze: "Remind again after (minutes)",
       bg_aurora: "Aurora", bg_black: "Black", bg_sunset: "Sunset", bg_ocean: "Ocean", bg_forest: "Forest", bg_lavender: "Lavender",
       bg_ember: "Ember", bg_graphite: "Graphite", bg_midnight: "Midnight", bg_halloween: "Halloween", bg_festive: "Festive", tint_clear: "clear",
@@ -82,6 +83,7 @@
       notify_label: "Remind them on their phone when their task is overdue", on_board: "On the board", ha_on: "These people from Home Assistant are also on the board.",
     },
     de: {
+      rep_once: "Einmalig", once_on: "Einmalig am {date}", st_on: "Am {when}", once_note: "Wird einmal erledigt. Danach verschwindet sie am nächsten Tag von der Tafel.", q_today: "Heute", q_tomorrow: "Morgen", pick_day: "Tag", err_date: "Wähle einen Tag.",
       alert_title: "Nicht vergessen", alert_one: "Diese Aufgabe ist überfällig.", alert_many: "{n} Aufgaben sind überfällig.", alert_done: "Erledigt", alert_snooze: "In {n} Min. erinnern", alert_ok: "Verstanden", cf_alert: "Überfällige Aufgaben auf diesem Bildschirm einblenden", cf_sound: "Beim Einblenden einen Ton abspielen", cf_snooze: "Erneut erinnern nach (Minuten)",
       bg_aurora: "Polarlicht", bg_black: "Schwarz", bg_sunset: "Sonnenuntergang", bg_ocean: "Ozean", bg_forest: "Wald", bg_lavender: "Lavendel",
       bg_ember: "Glut", bg_graphite: "Graphit", bg_midnight: "Mitternacht", bg_halloween: "Halloween", bg_festive: "Festlich",
@@ -126,6 +128,7 @@
       notify_label: "Auf dem Handy erinnern, wenn ihre Aufgabe überfällig ist", on_board: "Auf der Tafel", ha_on: "Diese Personen aus Home Assistant sind auch auf der Tafel.",
     },
     es: {
+      rep_once: "Una vez", once_on: "Una vez el {date}", st_on: "El {when}", once_note: "Se hace una sola vez. Cuando esté hecha, desaparece del tablero al día siguiente.", q_today: "Hoy", q_tomorrow: "Mañana", pick_day: "Día", err_date: "Elige un día.",
       alert_title: "No lo olvides", alert_one: "Esta tarea está atrasada.", alert_many: "Hay {n} tareas atrasadas.", alert_done: "Hecha", alert_snooze: "Recuérdamelo en {n} min", alert_ok: "Entendido", cf_alert: "Mostrar las tareas atrasadas en esta pantalla", cf_sound: "Hacer sonar un aviso al mostrarlas", cf_snooze: "Volver a recordar tras (minutos)",
       bg_aurora: "Aurora", bg_black: "Negro", bg_sunset: "Atardecer", bg_ocean: "Océano", bg_forest: "Bosque", bg_lavender: "Lavanda",
       bg_ember: "Brasa", bg_graphite: "Grafito", bg_midnight: "Medianoche", bg_halloween: "Halloween", bg_festive: "Festivo", tint_clear: "transparente",
@@ -167,6 +170,7 @@
       notify_label: "Avisar en su móvil cuando su tarea esté atrasada", on_board: "En el tablero", ha_on: "Estas personas de Home Assistant también están en el tablero.",
     },
     fr: {
+      rep_once: "Une fois", once_on: "Une fois le {date}", st_on: "Le {when}", once_note: "Elle se fait une seule fois. Une fois faite, elle quitte le tableau le lendemain.", q_today: "Aujourd'hui", q_tomorrow: "Demain", pick_day: "Jour", err_date: "Choisissez un jour.",
       alert_title: "N'oubliez pas", alert_one: "Cette tâche est en retard.", alert_many: "{n} tâches sont en retard.", alert_done: "Fait", alert_snooze: "Me le rappeler dans {n} min", alert_ok: "Compris", cf_alert: "Afficher les tâches en retard sur cet écran", cf_sound: "Jouer un carillon à l'affichage", cf_snooze: "Rappeler à nouveau après (minutes)",
       bg_aurora: "Aurore", bg_black: "Noir", bg_sunset: "Coucher de soleil", bg_ocean: "Océan", bg_forest: "Forêt", bg_lavender: "Lavande",
       bg_ember: "Braise", bg_graphite: "Graphite", bg_midnight: "Minuit", bg_halloween: "Halloween", bg_festive: "Festif", tint_clear: "transparent",
@@ -261,6 +265,12 @@
     },
   };
 
+  // A local calendar day as YYYY-MM-DD, `offset` days from today.
+  const isoDay = (offset = 0) => {
+    const d = new Date();
+    d.setDate(d.getDate() + offset);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
   const esc = (s) =>
     String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   const hash = (s) => [...String(s)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
@@ -370,7 +380,7 @@
   .row { display:flex; align-items:center; gap:12px; margin: 12px 0; flex-wrap:wrap; }
   .row > label { width: 54px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color: var(--gm-dim); }
   .row .chips { display:flex; gap:8px; flex-wrap:wrap; flex:1; }
-  .tabs { display:inline-flex; padding:4px; border-radius:999px; background: rgba(0,0,0,.2); margin: 8px 0 12px; }
+  .tabs { display:inline-flex; flex-wrap:wrap; max-width:100%; padding:4px; border-radius:24px; background: rgba(0,0,0,.2); margin: 8px 0 12px; }
   .tabs button { padding: 9px 20px; border-radius:999px; font-size:14px; color: var(--gm-dim); }
   .tabs button.on { background: rgba(255,255,255,.22); color: var(--gm-text); }
   .emoji { font-size: 22px; width:40px; height:40px; border-radius:12px; display:grid; place-items:center; }
@@ -396,12 +406,12 @@
 
   /* overdue pop-up */
   .alert-scrim { z-index: 8; background: rgba(28,4,14,.5); }
-  .alert { width: min(640px, 100%); max-height:100%; overflow:auto; padding: 28px 28px 22px; text-align:center; scrollbar-width:none;
+  .od-alert { width: min(640px, 100%); max-height:100%; overflow:auto; padding: 28px 28px 22px; text-align:center; scrollbar-width:none;
     border-color: rgba(${OVERDUE_TINT}, .55); animation: pop .35s cubic-bezier(.2,.9,.25,1.1) both, glow 2.6s ease-in-out .35s infinite; }
-  .alert.settled { animation: glow 2.6s ease-in-out infinite; }
-  .alert .bell { font-size: 56px; line-height:1; display:inline-block; animation: ring 1.4s ease-in-out .3s 2; }
-  .alert h2 { margin: 12px 0 4px; font-size: 30px; font-weight:600; }
-  .alert .lead { margin:0; }
+  .od-alert.settled { animation: glow 2.6s ease-in-out infinite; }
+  .od-alert .bell { font-size: 56px; line-height:1; display:inline-block; animation: ring 1.4s ease-in-out .3s 2; }
+  .od-alert h2 { margin: 12px 0 4px; font-size: 30px; font-weight:600; }
+  .od-alert .lead { margin:0; }
   @keyframes ring { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(16deg); } 30% { transform: rotate(-14deg); } 45% { transform: rotate(10deg); } 60% { transform: rotate(-6deg); } 75% { transform: rotate(3deg); } }
   .alert-list { list-style:none; margin: 20px 0 0; padding:0; display:grid; gap:10px; text-align:left; }
   .alert-list li { display:flex; align-items:center; gap:14px; padding: 12px 12px 12px 14px; border-radius: 22px;
@@ -409,7 +419,7 @@
   .alert-list .t-icon { width:52px; height:52px; font-size:32px; flex:none; }
   .alert-list .t-body { flex:1; min-width:0; }
   .alert-list .t-title { font-size: 19px; }
-  .alert .sheet-foot { justify-content:flex-end; flex-wrap:wrap; }
+  .od-alert .sheet-foot { justify-content:flex-end; flex-wrap:wrap; }
   .primary.sm { padding: 11px 20px; font-size:15px; flex:none; }
 
   /* ambient */
@@ -992,6 +1002,11 @@
         const n = Number(t.every_days) || 1;
         return at(n > 1 ? this._t("every_n", { n }) : this._t("every_day"));
       }
+      if (t.repeat === "once") {
+        const d = t.date ? new Date(`${t.date}T00:00`) : null;
+        const date = d && !Number.isNaN(d.getTime()) ? d.toLocaleDateString(this._lang(), { weekday: "short", month: "short", day: "numeric" }) : "";
+        return at(this._t("once_on", { date }));
+      }
       if (times.length === 2) return at(this._t("twice"));
       if (times.length > 2) return at(this._t("n_times", { n: times.length }));
       return at(this._t("every_day"));
@@ -1009,6 +1024,11 @@
           if (t.due_at) return this._t("st_due_by", { time: `<b>${esc(this._clock(t.due_at))}</b>` });
           return esc(t.repeat === "every" ? this._t("st_due_today") : this._t("st_any_time"));
         default:
+          if (t.repeat === "once" && t.next_due) {
+            const when = this._nextWhen(t);
+            // "Tomorrow 7:00 AM" rather than "On tomorrow 7:00 AM".
+            return esc(this._dayDiff(t.next_due) <= 1 ? when.charAt(0).toUpperCase() + when.slice(1) : this._t("st_on", { when }));
+          }
           return esc(t.next_due ? this._t("st_next", { when: this._nextWhen(t) }) : this._t("st_not_today"));
       }
     }
@@ -1331,6 +1351,7 @@
         days: t ? [...(t.days || [])] : [],
         every_days: t ? Number(t.every_days) || 1 : 3,
         times: t ? [...(t.times || [])] : [],
+        date: (t && t.date) || isoDay(0),
         notify: t ? t.notify !== false : true,
         newTime: "",
         more: false,
@@ -1346,6 +1367,10 @@
           this._syncSave();
         }
         if (e.target.id === "gt-e-time") this._editor.newTime = e.target.value;
+        if (e.target.id === "gt-e-date" && e.target.value) {
+          this._editor.date = e.target.value;
+          this._syncSave();
+        }
       };
       scrim.onkeydown = (e) => {
         if (e.key !== "Enter" || !this._editor) return;
@@ -1371,7 +1396,8 @@
       const ed = this._editor;
       if (!ed || !/^\d{1,2}:\d{2}/.test(value || "")) return;
       const t = value.slice(0, 5).padStart(5, "0");
-      if (!ed.times.includes(t) && ed.times.length < 6) ed.times = [...ed.times, t].sort();
+      if (ed.repeat === "once") ed.times = [t]; // one time: one due time
+      else if (!ed.times.includes(t) && ed.times.length < 6) ed.times = [...ed.times, t].sort();
       ed.newTime = "";
       this._renderEditor();
     }
@@ -1380,7 +1406,7 @@
       const ed = this._editor;
       const btn = this.shadowRoot.querySelector(".editor-scrim [data-action=e-save]");
       if (!ed || !btn) return;
-      const ok = ed.title.trim() && (ed.repeat !== "weekly" || ed.days.length);
+      const ok = ed.title.trim() && (ed.repeat !== "weekly" || ed.days.length) && (ed.repeat !== "once" || ed.date);
       btn.disabled = !ok || ed.saving;
     }
 
@@ -1407,9 +1433,15 @@
           </section>
           <section class="step">
             <h3 class="step-h"><i>2</i>${this._t("step_often")}</h3>
-            <div class="tabs">${tab("daily", this._t("rep_daily"))}${tab("weekly", this._t("rep_weekly"))}${tab("every", this._t("rep_every"))}</div>
+            <div class="tabs">${tab("daily", this._t("rep_daily"))}${tab("weekly", this._t("rep_weekly"))}${tab("every", this._t("rep_every"))}${tab("once", this._t("rep_once"))}</div>
             ${
-              ed.repeat === "weekly"
+              ed.repeat === "once"
+                ? `<div class="row">
+                     ${[0, 1].map((o) => `<button class="chip text ${ed.date === isoDay(o) ? "on" : ""}" data-action="e-date" data-o="${o}">${this._t(o ? "q_tomorrow" : "q_today")}</button>`).join("")}
+                     <input id="gt-e-date" class="field" type="date" value="${esc(ed.date)}" min="${isoDay(0)}" aria-label="${this._t("pick_day")}">
+                   </div>
+                   <p class="muted">${this._t("once_note")}</p>`
+                : ed.repeat === "weekly"
                 ? `<div class="days">${DAY_INDEX.map((d) => `<button class="chip text ${ed.days.includes(d) ? "on" : ""}" data-action="e-day" data-d="${d}" aria-pressed="${ed.days.includes(d)}">${esc(this._dayName(d))}</button>`).join("")}</div>`
                 : ed.repeat === "every"
                   ? `<div class="stepper"><button class="icon-btn" data-action="e-every" data-step="-1" aria-label="${this._t("fewer_days")}">−</button><b>${esc(ed.every_days > 1 ? this._t("every_n", { n: ed.every_days }) : this._t("every_day"))}</b><button class="icon-btn" data-action="e-every" data-step="1" aria-label="${this._t("more_days")}">${ICON.plus}</button></div>
@@ -1468,6 +1500,10 @@
         ed.error = this._t("err_day");
         return this._renderEditor();
       }
+      if (ed.repeat === "once" && !ed.date) {
+        ed.error = this._t("err_date");
+        return this._renderEditor();
+      }
       const payload = {
         type: "glass_tasks/task/save",
         title: ed.title.trim(),
@@ -1480,6 +1516,7 @@
         times: ed.times,
         notify: ed.notify,
       };
+      if (ed.repeat === "once") payload.date = ed.date;
       if (ed.id) payload.task_id = ed.id;
       ed.saving = true;
       ed.error = "";
@@ -1515,6 +1552,13 @@
         case "e-repeat":
           ed.repeat = el.dataset.repeat;
           if (ed.repeat === "weekly" && !ed.days.length) ed.days = [(new Date().getDay() + 6) % 7];
+          if (ed.repeat === "once") {
+            ed.times = ed.times.slice(0, 1);
+            ed.date = ed.date || isoDay(0);
+          }
+          break;
+        case "e-date":
+          ed.date = isoDay(Number(el.dataset.o) || 0);
           break;
         case "e-day": {
           const d = Number(el.dataset.d);
@@ -1908,7 +1952,7 @@
       scrim.onclick = null; // a tap beside the alert doesn't dismiss it
       const whose = (t) => (!t.assignee || t.assignee === "everyone" ? this._t("everyones_job") : this._t("job", { name: this._person(t.assignee, this._t("someone")).name }));
       scrim.innerHTML = `
-        <div class="alert glass${settled ? " settled" : ""}" role="alertdialog" aria-live="assertive" style="--tint:${OVERDUE_TINT}">
+        <div class="od-alert glass${settled ? " settled" : ""}" role="alertdialog" aria-live="assertive" style="--tint:${OVERDUE_TINT}">
           <span class="bell" aria-hidden="true">⏰</span>
           <h2>${esc(this._t("alert_title"))}</h2>
           <p class="lead">${esc(tasks.length > 1 ? this._t("alert_many", { n: tasks.length }) : this._t("alert_one"))}</p>
