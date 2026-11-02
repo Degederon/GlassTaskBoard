@@ -6,6 +6,8 @@ All notable changes to this project are documented in this file.
 
 ### Added
 
+- A ready-to-go dashboard, `dashboards/household-tasks.yaml`: the full-screen board for a wall tablet, plus a **Today** view with what's due, every task's status and schedule, and what got done today. It finds every task on its own.
+- A quick start at the top of the README: install, make a dashboard, configure.
 - German, Spanish and French. The board's buttons, task status and schedules, the task form and its ready-made tasks, background names, People screen, ambient screen and card settings follow each person's Home Assistant language; the setup and options screens, the actions and phone reminders follow Home Assistant's language. English is unchanged.
 - The integration now adds the board to **Settings → Dashboards → Resources** automatically and updates its version number after every update, so tablets always load the current board. An entry added by hand is updated rather than duplicated. Dashboards in YAML mode get the board loaded on every page instead.
 

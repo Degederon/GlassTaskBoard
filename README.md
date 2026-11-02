@@ -31,21 +31,17 @@ Glass Task Board is the companion to [Glass Message Board](https://github.com/De
 
 ### Make a dashboard
 
+A ready-to-go dashboard comes with the board: [`dashboards/household-tasks.yaml`](dashboards/household-tasks.yaml). It has two views:
+
+- **Board:** the glass board, full screen, for a wall tablet.
+- **Today:** what's due right now, every task with its status and schedule, and what got done today. It finds every task on its own, so there's nothing to edit.
+
 1. Go to **Settings → Dashboards → + Add dashboard → New dashboard from scratch**.
 2. Name it `Household Tasks` and select **Create**, then open it from the sidebar.
 3. Select the **pencil**, then **⋮ → Raw configuration editor**.
-4. Replace everything with this, then select **Save** and **Done**:
+4. Delete everything, paste the contents of [`household-tasks.yaml`](https://raw.githubusercontent.com/Degederon/GlassTaskBoard/main/dashboards/household-tasks.yaml), then select **Save** and **Done**.
 
-   ```yaml
-   views:
-     - title: Tasks
-       type: panel
-       cards:
-         - type: custom:glass-task-board
-           title: Household tasks
-   ```
-
-You now have a full-screen board, ready for a wall tablet. To add the board to an existing dashboard instead, select the **pencil**, then **+ Add card**, and search for **Glass Task Board**.
+To add the board to an existing dashboard instead, select the **pencil**, then **+ Add card**, and search for **Glass Task Board**.
 
 ### Configure
 
