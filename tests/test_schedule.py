@@ -103,6 +103,12 @@ case("untimed one-time is due all its day", S.compute(anytime, at(5, 23))["statu
 case("untimed one-time is overdue the next day", S.compute(anytime, at(6, 0, 30))["status"], "overdue")
 case("untimed one-time upcoming shows its day", S.compute(anytime, at(4, 9))["next_due"], at(5, 0).isoformat())
 
+late_setup = task(repeat="once", date="2026-11-05", times=["07:00"], created=at(5, 9, 15).isoformat())
+case("one-time set up after its time is due, not overdue", S.compute(late_setup, at(5, 9, 20))["status"], "due")
+case("...for the rest of that day", S.compute(late_setup, at(5, 23, 30))["status"], "due")
+case("...and overdue the next day if still not done", S.compute(late_setup, at(6, 8))["status"], "overdue")
+case("one-time set up before its time still goes overdue", S.compute(task(repeat="once", date="2026-11-05", times=["07:00"], created=at(5, 6).isoformat()), at(5, 7, 30))["status"], "overdue")
+
 # Descriptions
 case("describe twice a day", S.describe(task(**feed)), "2 times a day by 08:00 and 18:00")
 case("describe weekly", S.describe(bins), "Every Tue by 19:00")

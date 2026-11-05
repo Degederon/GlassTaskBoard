@@ -5,7 +5,7 @@
  * No build step, no dependencies. Served automatically by the glass_tasks integration.
  */
 (() => {
-  const VERSION = "0.4.0";
+  const VERSION = "0.4.1";
   const TAG = "glass-task-board";
   if (customElements.get(TAG)) return;
 
@@ -406,9 +406,16 @@
 
   /* overdue pop-up */
   .alert-scrim { z-index: 8; background: rgba(28,4,14,.5); }
-  .od-alert { width: min(640px, 100%); max-height:100%; overflow:auto; padding: 28px 28px 22px; text-align:center; scrollbar-width:none;
-    border-color: rgba(${OVERDUE_TINT}, .55); animation: pop .35s cubic-bezier(.2,.9,.25,1.1) both, glow 2.6s ease-in-out .35s infinite; }
-  .od-alert.settled { animation: glow 2.6s ease-in-out infinite; }
+  /* The glow breathes on a separate layer that ignores touches. The scrolling box itself never
+     animates: iPad Safari can drop taps inside a scrolling element that keeps animating. */
+  .od-wrap { position:relative; width: min(640px, 100%); max-height:100%; display:flex; border-radius: var(--gm-radius);
+    animation: pop .35s cubic-bezier(.2,.9,.25,1.1) both; }
+  .od-wrap.settled { animation:none; }
+  .od-wrap::after { content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    box-shadow: 0 0 0 1.5px rgba(${OVERDUE_TINT}, .75), 0 0 46px -8px rgba(${OVERDUE_TINT}, .85); animation: breathe 2.6s ease-in-out .35s infinite; }
+  @keyframes breathe { 50% { opacity:.3; } }
+  .od-alert { width:100%; max-height:100%; overflow:auto; -webkit-overflow-scrolling: touch; padding: 28px 28px 22px; text-align:center; scrollbar-width:none;
+    border-color: rgba(${OVERDUE_TINT}, .55); }
   .od-alert .bell { font-size: 56px; line-height:1; display:inline-block; animation: ring 1.4s ease-in-out .3s 2; }
   .od-alert h2 { margin: 12px 0 4px; font-size: 30px; font-weight:600; }
   .od-alert .lead { margin:0; }
@@ -593,7 +600,7 @@
   .a-spot .t-icon { width:76px; height:76px; font-size:46px; }
   .a-spot .t-status { font-size: 17px; margin-top:4px; }
   @media (max-width: 600px) { .filters { order:5; flex: 1 1 100%; flex-wrap:nowrap; overflow-x:auto; justify-content:flex-start; scrollbar-width:none; } .filters::-webkit-scrollbar { display:none; } .chip { flex:none; } .t-icon { width:48px; height:48px; font-size:30px; } .t-title { font-size:18px; } .board { gap:14px; } }
-  @media (prefers-reduced-motion: reduce) { .task, .task.st-overdue, .task.just-done .t-check, .task.just-done::after { animation: none !important; } }
+  @media (prefers-reduced-motion: reduce) { .task, .task.st-overdue, .task.just-done .t-check, .task.just-done::after, .od-wrap, .od-wrap::after, .od-alert .bell { animation: none !important; } }
   `;
 
   const DAY_INDEX = [0, 1, 2, 3, 4, 5, 6]; // 0 = Monday, like Python
@@ -1952,7 +1959,7 @@
       scrim.onclick = null; // a tap beside the alert doesn't dismiss it
       const whose = (t) => (!t.assignee || t.assignee === "everyone" ? this._t("everyones_job") : this._t("job", { name: this._person(t.assignee, this._t("someone")).name }));
       scrim.innerHTML = `
-        <div class="od-alert glass${settled ? " settled" : ""}" role="alertdialog" aria-live="assertive" style="--tint:${OVERDUE_TINT}">
+        <div class="od-wrap${settled ? " settled" : ""}"><div class="od-alert glass" role="alertdialog" aria-live="assertive" style="--tint:${OVERDUE_TINT}">
           <span class="bell" aria-hidden="true">⏰</span>
           <h2>${esc(this._t("alert_title"))}</h2>
           <p class="lead">${esc(tasks.length > 1 ? this._t("alert_many", { n: tasks.length }) : this._t("alert_one"))}</p>
@@ -1971,7 +1978,7 @@
             <button class="ghost-btn" data-action="x-snooze">${ICON.clock}<span>${esc(this._t("alert_snooze", { n: this._snoozeMinutes() }))}</span></button>
             <button class="ghost-btn" data-action="x-ok">${ICON.check}<span>${esc(this._t("alert_ok"))}</span></button>
           </div>
-        </div>`;
+        </div></div>`;
     }
 
     _closeAlert() {

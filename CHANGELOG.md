@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.4.1] - 2026-11-05
+
+### Fixed
+
+- On an iPad, the overdue pop-up's buttons didn't respond to taps. The pop-up's glow now runs on a separate layer that ignores touches, so the box you tap no longer animates; iPad Safari can drop taps inside a scrolling box that keeps animating. It looks the same.
+- A one-time task saved after its due time had already passed (for example, set up at 9:15 for "today by 7:00") no longer pops up as overdue straight away. It's due for the rest of that day, and overdue the next day if it's still not done.
+
 ## [0.4.0] - 2026-11-02
 
 ### Added

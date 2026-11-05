@@ -218,6 +218,10 @@ def _compute_once(task: dict[str, Any], now: datetime) -> dict[str, Any]:
     completions = _completions(task, tz)
     # Only the first due time counts: a one-time task is done in one go.
     slot = _day_slots(task, day, tz)[0]
+    since = _since(task, tz)
+    if slot.timed and since is not None and since >= slot.due:
+        # Set up after its time had already passed: due for the rest of that day, not overdue at once.
+        slot = Slot(slot.start, _midnight(day + timedelta(days=1), tz), False)
     if completions:
         return _result(DONE, slot, None, completions[-1][1], 1, 1)
     if now < slot.start:

@@ -6,7 +6,7 @@
 
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/docs/faq/custom_repositories)
 [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.11%2B-18BCF2.svg?logo=homeassistant&logoColor=white)](https://www.home-assistant.io/)
-[![Version](https://img.shields.io/badge/version-0.4.0-6E56CF.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.4.1-6E56CF.svg)](CHANGELOG.md)
 [![Languages](https://img.shields.io/badge/languages-English%20%7C%20Deutsch%20%7C%20Espa%C3%B1ol%20%7C%20Fran%C3%A7ais-2E9E6B.svg)](#languages)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -175,7 +175,7 @@ After installing or updating, refresh the page once so your browser loads the bo
 If you manage dashboards in YAML (`lovelace: mode: yaml` in `configuration.yaml`), the integration can't edit your resources. It loads the board on every page instead, so it still works. If you prefer to list it yourself, add this under `lovelace: resources:`:
 
 ```yaml
-- url: /glass_tasks/glass-task-board.js?v=0.4.0
+- url: /glass_tasks/glass-task-board.js?v=0.4.1
   type: module
 ```
 
